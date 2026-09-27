@@ -1,0 +1,372 @@
+<div class="ot-detail-page" *ngIf="!loading && ot">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <button class="btn" (click)="goBack()">← Retour</button>
+    <div class="top-bar-center">
+      <span class="code-ot">{{ ot.codeOT }}</span>
+      <span class="type-badge preventif">Maintenance Préventive</span>
+    </div>
+    <button class="btn btn-primary" (click)="printOT()">Imprimer PDF</button>
+  </div>
+
+  <!-- 1. GAMME (OT auto uniquement) -->
+  <div class="card" *ngIf="ot.gamme">
+    <div class="card-header"><div class="card-title">Gamme de Maintenance</div></div>
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Fréquence</span>
+          <span class="info-value">{{ ot.gamme?.frequence || '—' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Mode MA</span>
+          <span class="info-value">{{ ot.gamme?.modeMa || '—' }}</span>
+        </div>
+        <div class="info-item span-2">
+          <span class="info-label">Description</span>
+          <span class="info-value">{{ ot.gamme?.descriptionGamme || '—' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. INFOS OT -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">Détails de l'Ordre de Travail</div></div>
+    <div class="card-body">
+      <div class="info-grid">
+
+        <div class="info-item">
+          <span class="info-label">Date de création</span>
+          <span class="info-value">{{ ot.dateCreation ? formatDate(ot.dateCreation) : '—' }}</span>
+        </div>
+
+        <!-- Créé par : seulement pour OT manuel -->
+        <div class="info-item" *ngIf="!ot.gamme && ot.superviseur">
+          <span class="info-label">Créé par</span>
+          <span class="info-value">
+            {{ ot.superviseur?.nomComplet }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Nature</span>
+          <span class="info-value">{{ formatNature(ot.natureAnomalie) }}</span>
+        </div>
+
+        <!-- Technicien global : seulement pour OT auto (gamme) -->
+        <div class="info-item" *ngIf="ot.gamme">
+          <span class="info-label">Technicien affecté</span>
+          <span class="info-value">{{ formatRole(ot.affectationTechnicien) }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Durée intervention</span>
+          <span class="info-value">
+            {{ ot.dureeIntervention ? (ot.dureeIntervention + ' min') : '—' }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Coût intervention</span>
+          <span class="info-value">
+            {{ ot.coutIntervention ? (ot.coutIntervention | number:'1.2-2') + ' MAD' : '—' }}
+          </span>
+        </div>
+
+        <div class="info-item" *ngIf="ot.dateCloture">
+          <span class="info-label">Date de clôture</span>
+          <span class="info-value">{{ formatDate(ot.dateCloture) }}</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+<div class="card" *ngIf="ot?.gamme && filteredChecklist && filteredChecklist.length > 0">
+  <div class="card-header">
+    <div class="card-title-container" style="display: flex; align-items: center; gap: 15px;">
+      <div class="card-title">Opérations à effectuer</div>
+      <button *ngIf="isEditable()" class="btn btn-sm btn-secondary" (click)="checkAllChecklist()">
+        ✓ Tout cocher
+      </button>
+    </div>
+    <div class="progression-wrap">
+      <span class="ops-count">
+        {{ getProgression().faites }} / {{ getProgression().total }}
+      </span>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill"
+             [style.width.%]="getProgression().pct"
+             [class.done]="getProgression().pct === 100">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card-body" style="padding:0">
+    <table class="ops-table">
+      <thead>
+        <tr>
+          <th style="width:75px; text-align:center;">Statut</th>
+          <th>Équipement</th>
+          <th>Sous-équipement</th>
+          <th>Action</th>
+          <th *ngIf="isGammeGraissage()">Moyen de contrôle</th>
+          <th *ngIf="isGammeGraissage()">Type</th>
+          <th>Poste</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ligne of filteredChecklist"
+            [class.op-done]="ligne.estFaite"
+            (click)="toggleFaite(ligne)"
+            [style.cursor]="isEditable() ? 'pointer' : 'default'">
+          <td class="td-check" style="text-align:center; vertical-align:middle;">
+            <div class="check-box" [class.checked]="ligne.estFaite">
+              <svg *ngIf="ligne.estFaite" width="12" height="12" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </td>
+          <td>{{ ligne.operation?.equipement || '—' }}</td>
+          <td>{{ ligne.operation?.sousEquipement || '—' }}</td>
+          <td [class.op-action-done]="ligne.estFaite">{{ ligne.operation?.action }}</td>
+          <td *ngIf="isGammeGraissage()">{{ ligne.operation?.moyenControle || '—' }}</td>
+          <td *ngIf="isGammeGraissage()">{{ ligne.operation?.type || '—' }}</td>
+          <td>
+            <span class="role-badge-sm" *ngIf="ligne.operation?.posteTravailOperation">
+              {{ formatRole(ligne.operation?.posteTravailOperation) }}
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="card" *ngIf="!ot?.gamme && ot?.actionsStructurees && ot.actionsStructurees.length > 0">
+  <div class="card-header">
+    <div class="card-title-container" style="display: flex; align-items: center; gap: 15px;">
+      <div class="card-title">Actions à réaliser</div>
+      <button *ngIf="isEditable()" class="btn btn-sm btn-secondary" (click)="checkAllActions()">
+        ✓ Tout cocher
+      </button>
+    </div>
+    <div class="progression-wrap">
+      <span class="ops-count">
+        {{ getProgressionActions().faites }} / {{ getProgressionActions().total }}
+      </span>
+      <div class="progress-bar-track">
+        <div class="progress-bar-fill"
+             [style.width.%]="getProgressionActions().pct"
+             [class.done]="getProgressionActions().pct === 100">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body" style="padding:0">
+    <table class="ops-table">
+      <thead>
+        <tr>
+          <th style="width:75px; text-align:center;">Statut</th>
+          <th>Équipement</th>
+          <th>Sous-équipement</th>
+          <th>Action</th>
+          <th>Mode</th>
+          <th>Technicien</th>
+          <th>Contrôle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let a of ot.actionsStructurees"
+            [class.op-done]="a.estFaite"
+            (click)="toggleActionFaite(a)"
+            [style.cursor]="isEditable() ? 'pointer' : 'default'">
+          <td class="td-check" style="text-align:center; vertical-align:middle;">
+            <div class="check-box" [class.checked]="a.estFaite">
+              <svg *ngIf="a.estFaite" width="12" height="12" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="3">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+          </td>
+          <td>{{ a.equipement || '—' }}</td>
+          <td>{{ a.sousEquipement || '—' }}</td>
+          <td [class.op-action-done]="a.estFaite">{{ a.action || '—' }}</td>
+          <td>
+            <span class="badge-mode" [class.marche]="a.mode === 'Marche'">
+              {{ a.mode || '—' }}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="a.affectationTechnicien">
+              {{ formatRole(a.affectationTechnicien) }}
+            </span>
+            <span *ngIf="!a.affectationTechnicien">—</span>
+          </td>
+          <td>{{ a.moyenControle || '—' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <!-- 4. RAPPORT D'INTERVENTION -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Rapport d'intervention</div>
+      <span class="statut-chip statut-{{ ot.statut }}">{{ formatStatut(ot.statut) }}</span>
+    </div>
+    <div class="card-body">
+
+      <!-- STATUT -->
+      <div class="form-group">
+        <label class="form-label">Statut</label>
+        <div class="field-display" *ngIf="saved">{{ formatStatut(feedback.statut) }}</div>
+        <select class="form-control" [(ngModel)]="feedback.statut"
+                *ngIf="!saved" [disabled]="!isEditable()">
+          <option *ngFor="let s of getStatutsDisponibles()" [value]="s">
+            {{ formatStatut(s) }}
+          </option>
+        </select>
+      </div>
+
+      <!-- DATES -->
+      <div class="info-grid" style="margin-bottom:20px">
+        <div class="form-group">
+          <label class="form-label">Date de début</label>
+          <div class="field-display" *ngIf="saved">
+            {{ feedback.dateDebutIntervention ? formatDate(feedback.dateDebutIntervention) : '—' }}
+          </div>
+          <input type="datetime-local" class="form-control"
+                 [(ngModel)]="feedback.dateDebutIntervention" *ngIf="!saved">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date de fin</label>
+          <div class="field-display" *ngIf="saved">
+            {{ feedback.dateFinIntervention ? formatDate(feedback.dateFinIntervention) : '—' }}
+          </div>
+          <input type="datetime-local" class="form-control"
+       [(ngModel)]="feedback.dateFinIntervention" *ngIf="!saved"
+       [disabled]="feedback.statut === 'Termine'">
+        <small class="text-muted" *ngIf="feedback.statut === 'Termine'">
+          La date de fin ne peut plus être modifiée une fois l'OT terminé.
+        </small>
+        </div>
+      </div>
+
+      <!-- PDR CONSOMMÉES -->
+      <div class="form-section">
+        <label class="section-label">Pièces de rechange consommées</label>
+
+        <div class="pdr-list" *ngIf="feedback.piecesConsommees.length > 0">
+          <div class="pdr-row" *ngFor="let p of feedback.piecesConsommees; let i = index">
+            <span class="code-chip">{{ getPdrNom(p.pieceRechangeId) }}</span>
+            <span class="pdr-qty">× {{ p.quantiteConsommee }}</span>
+            <button class="btn-remove-pdr" (click)="removePdr(i)" *ngIf="!saved" title="Retirer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="text-muted small"
+             *ngIf="feedback.piecesConsommees.length === 0 && saved">
+          Aucune pièce consommée enregistrée.
+        </div>
+
+        <div class="pdr-add-row" *ngIf="!saved">
+          <select [(ngModel)]="newPdr.pieceRechangeId" class="form-select">
+            <option [ngValue]="null">— Sélectionner une pièce —</option>
+            <option *ngFor="let p of pdrList" [ngValue]="p.id"
+                    [disabled]="p.stockActuel < p.stockMin">
+              {{ p.code }} — {{ p.nom }}
+              {{ p.stockActuel < p.stockMin ? ' (stock insuffisant)' : '' }}
+            </option>
+          </select>
+          <input type="number" [(ngModel)]="newPdr.quantiteConsommee"
+                 placeholder="Qté" min="1" class="form-input qty-input" />
+          <button class="btn-add-pdr" (click)="addPdr()"
+                  [disabled]="!newPdr.pieceRechangeId || !newPdr.quantiteConsommee">
+            + Ajouter
+          </button>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div class="form-group">
+        <label class="form-label">Documents / OT Renseigné</label>
+
+        <div class="docs-grid" *ngIf="ot.otReseignes && ot.otReseignes.length > 0">
+          <div class="doc-card" *ngFor="let doc of ot.otReseignes"
+               (click)="openDocument(doc)">
+            <ng-container *ngIf="isImage(doc.nomFichier)">
+              <img class="doc-img" [src]="getDocUrl(doc)"
+                   [alt]="doc.nomFichier" loading="lazy">
+            </ng-container>
+            <ng-container *ngIf="!isImage(doc.nomFichier)">
+              <div class="doc-pdf-thumb">📄</div>
+            </ng-container>
+            <span class="doc-name">{{ doc.nomFichier }}</span>
+          </div>
+        </div>
+
+        <div class="file-upload-zone" [class.drag-over]="isDragOver"
+             (dragover)="onDragOver($event)"
+             (dragleave)="isDragOver = false"
+             (drop)="onDrop($event)">
+          <input type="file" multiple accept="image/*,.pdf" (change)="onFileSelect($event)">
+          <p>Cliquez ou glissez l'OT scanné ici</p>
+        </div>
+
+        <div *ngFor="let f of selectedFiles; let i = index"
+             class="action-tag"
+             style="margin-top:5px; display:inline-flex; margin-right:6px; gap:4px;">
+          {{ f.name }}
+          <button type="button" (click)="removeFile(i)">×</button>
+        </div>
+      </div>
+
+      <!-- Warning date fin manquante -->
+      <div class="hint-warning"
+           *ngIf="feedback.statut === 'Termine' && !feedback.dateFinIntervention">
+        ⚠️ Renseignez la date de fin pour pouvoir terminer cet OT.
+      </div>
+
+      <!-- Boutons -->
+      <div class="form-actions">
+        <button class="btn btn-primary" style="width:100%"
+                (click)="submitFeedback()"
+                [disabled]="saving || !canSubmit()"
+                *ngIf="!saved">
+          {{ saving ? 'Enregistrement…' : 'Enregistrer le rapport' }}
+        </button>
+        <button class="btn btn-secondary" style="width:100%"
+                (click)="enableEdit()"
+                *ngIf="saved && isEditable()">
+          ✏️ Modifier le rapport
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;padding:60px;color:#718096" *ngIf="loading">
+  Chargement…
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" *ngIf="lightboxDoc" (click)="closeLightbox()">
+  <div class="lightbox-inner" (click)="$event.stopPropagation()">
+    <button class="lightbox-close" (click)="closeLightbox()">✕</button>
+    <img [src]="lightboxDoc" alt="Document">
+  </div>
+</div>

@@ -1,0 +1,184 @@
+<div class="list-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Ordres de Travail Préventifs</h1>
+      <p>{{ filtered.length }} OT(s)
+      </p>
+    </div>
+    <div class="header-right">
+      <button class="btn-secondary" (click)="activeTab === 'pmp' ? exportPMP() : exportPlanifie()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5"
+             stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v12"/>
+          <path d="M7 10l5 5 5-5"/>
+          <path d="M5 21h14"/>
+        </svg>
+        Exporter {{ activeTab === 'pmp' ? 'PMP' : 'Planifié' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- ONGLETS PMP / PLANIFIÉ -->
+  <div class="tabs-container">
+    <button class="tab-btn" [class.active]="activeTab === 'pmp'" (click)="setTab('pmp')">
+      PREVENTIF SYSTEMATIQUE
+      <span class="tab-badge">{{ countPMP }}</span>
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'planifie'" (click)="setTab('planifie')">
+      PREVENTIF
+      <span class="tab-badge">{{ countPlanifie }}</span>
+    </button>
+  </div>
+
+  <div class="loading-state" *ngIf="loading">Chargement…</div>
+
+  <div class="table-card" *ngIf="!loading">
+    <table>
+      <thead>
+        <tr>
+          <th>Code OT</th>
+                    <th *ngIf="activeTab === 'planifie'">
+  Créé par
+  <input class="col-filter-input" type="text"
+         placeholder="Filtrer..."
+         [(ngModel)]="filters.creePar"
+         (input)="applyFilters()">
+</th>
+
+<th *ngIf="activeTab === 'planifie'">
+  Créé le
+  <input class="col-filter-input" type="date"
+         [(ngModel)]="filters.creeLe"
+         (change)="applyFilters()">
+</th>
+          
+          <th>
+            
+            {{ activeTab === 'pmp' ? 'Titre / Zone' : 'Titre / Zone' }}
+            <input class="col-filter-input" type="text"
+                   placeholder="Filtrer par Équipement / Sous-équipement / Action"
+                   [(ngModel)]="filters.equipement"
+                   (input)="applyFilters()">
+          </th>
+          <th *ngIf="activeTab === 'pmp'">
+  Affectation Technicien
+  <select class="col-filter-select" [(ngModel)]="filters.affectation" (change)="applyFilters()">
+    <option value="all">Tous</option>
+    <option *ngFor="let a of toutesLesAffectations" [value]="a">
+      {{ affectationLabels[a] || a }}
+    </option>
+  </select>
+</th>
+
+<th *ngIf="activeTab === 'pmp'">
+  Nature d'Anomalie
+  <select class="col-filter-select" [(ngModel)]="filters.nature" (change)="applyFilters()">
+    <option value="all">Toutes</option>
+    <option *ngFor="let n of toutesLesAnomalies" [value]="n">{{ n }}</option>
+  </select>
+</th>
+          <th>
+            Statut
+            <select class="col-filter-select" [(ngModel)]="filters.statut" (change)="applyFilters()">
+              <option value="all">Tous</option>
+              <option *ngFor="let s of tousLesStatuts" [value]="s">{{ formatStatut(s) }}</option>
+            </select>
+          </th>
+          <th *ngIf="activeTab === 'planifie'">
+            Priorité
+            <select class="col-filter-select" [(ngModel)]="filters.priorite" (change)="applyFilters()">
+              <option value="all">Tous</option>
+              <option *ngFor="let p of toutesLesPriorites" [value]="p">{{ p }}</option>
+            </select>
+          </th>
+          <th *ngIf="roleService.hasRole('RESPONSABLE')" >Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <!-- ── PMP ── -->
+        <ng-container *ngIf="activeTab === 'pmp' && filtered.length > 0">
+          <ng-container *ngFor="let ot of filtered">
+            <tr class="ot-header-row" (click)="goToDetail(ot)">
+              <td><span class="code-chip">{{ ot.codeOT || '#' + ot.id }}</span></td>
+              <td>
+                <strong>{{ ot.gamme?.descriptionGamme || ot.titre }}</strong><br>
+                <small class="zone-label">{{ ot.zone?.libelle || '—' }}</small><br>
+              </td>
+              <td>
+               <span class="zone-label"> {{ affectationLabels[ot.affectationTechnicien]}} </span>
+                </td>
+              <td>
+                <span class="zone-label">{{ ot.natureAnomalie || '—' }}</span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getStatutClass(ot.statut)">{{ formatStatut(ot.statut) }}</span>
+              </td>
+              <td class="td-actions" (click)="$event.stopPropagation()">
+                <button class="action-btn edit" title="Modifier" (click)="goToEdit(ot)" *ngIf="roleService.hasRole('RESPONSABLE')" >
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+
+        <!-- ── PLANIFIÉ ── -->
+        <ng-container *ngIf="activeTab === 'planifie' && filtered.length > 0">
+          <ng-container *ngFor="let ot of filtered">
+            <tr class="ot-header-row" (click)="goToDetail(ot)">
+              <td><span class="code-chip">{{ ot.codeOT || '#' + ot.id }}</span></td>
+               <td>
+                <span class="affectation-chip">{{ ot.superviseur?.nomComplet || '—' }}</span>
+              </td>
+              <td>
+                <span class="affectation-chip">{{ ot.dateCreation | date:'dd/MM/yy HH:mm' }}</span>
+              </td>
+              
+              <td>
+                <strong>{{ ot.titre || '—' }}</strong><br>
+                <small class="zone-label">{{ ot.zone?.libelle || '—' }}</small>
+              </td>
+             
+              <td>
+                <span class="badge" [ngClass]="getStatutClass(ot.statut)">{{ formatStatut(ot.statut) }}</span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getPrioriteClass(ot.priorite)">{{ formatPriorite(ot.priorite) }}</span>
+              </td>
+              <td class="td-actions" (click)="$event.stopPropagation()">
+                <button class="action-btn edit" title="Modifier" (click)="goToEdit(ot)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+              </td>
+            </tr>
+          </ng-container>
+        </ng-container>
+
+        <!-- ── VIDE ── -->
+        <tr *ngIf="filtered.length === 0">
+          <td colspan="6">
+            <div class="empty-state" style="padding: 40px 0;">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <p>Aucun ordre de travail {{ activeTab === 'pmp' ? 'PMP' : 'planifié' }} trouvé</p>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+</div>

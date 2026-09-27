@@ -1,0 +1,124 @@
+<div class="predictions-page">
+
+      <!-- En-tête -->
+      <div class="page-header">
+        <div class="header-left">
+          <h1 class="page-title">
+            <span class="title-icon"></span>
+            Prédictions d'arrêt
+          </h1>
+          <p class="page-subtitle">Alertes générées automatiquement par le modèle IA</p>
+        </div>
+        <div class="header-actions">
+          <div class="filter-tabs">
+            <button [class.active]="filtreActif === 'toutes'"  (click)="setFiltre('toutes')">
+              Toutes <span class="tab-count">{{ notifications.length }}</span>
+            </button>
+            <button [class.active]="filtreActif === 'nonlues'" (click)="setFiltre('nonlues')">
+              Non lues <span class="tab-count unread">{{ countNonLues }}</span>
+            </button>
+            <button [class.active]="filtreActif === 'critique'" (click)="setFiltre('critique')">
+              Critiques
+            </button>
+          </div>
+          <button class="btn-mark-all" (click)="lireTout()" *ngIf="countNonLues > 0">
+            ✓ Tout marquer lu
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats rapides -->
+      <div class="stats-row">
+        <div class="stat-card critique">
+          <span class="stat-number">{{ countParNiveau('CRITIQUE') }}</span>
+          <span class="stat-label"> Critiques</span>
+        </div>
+        <div class="stat-card modere">
+          <span class="stat-number">{{ countParNiveau('MODÉRÉ') }}</span>
+          <span class="stat-label"> Modérées</span>
+        </div>
+        <div class="stat-card faible">
+          <span class="stat-number">{{ countParNiveau('FAIBLE') }}</span>
+          <span class="stat-label"> Faibles</span>
+        </div>
+        <div class="stat-card total">
+          <span class="stat-number">{{ countNonLues }}</span>
+          <span class="stat-label"> Non lues</span>
+        </div>
+      </div>
+
+      <!-- Liste vide -->
+      <div class="empty-state" *ngIf="filtered.length === 0 && !loading">
+        <div class="empty-icon">✅</div>
+        <p>Aucune alerte{{ filtreActif !== 'toutes' ? ' dans cette catégorie' : '' }}</p>
+      </div>
+
+      <!-- Loading -->
+      <div class="loading" *ngIf="loading">Chargement...</div>
+
+      <!-- Cartes notifications -->
+      <div class="notif-grid" *ngIf="!loading">
+        <div
+          class="notif-card"
+          *ngFor="let n of filtered; trackBy: trackById"
+          [class.unread]="!n.lue"
+          [class.niveau-critique]="n.niveauRisque === 'CRITIQUE'"
+          [class.niveau-modere]="n.niveauRisque === 'MODÉRÉ'"
+          [class.niveau-faible]="n.niveauRisque === 'FAIBLE'"
+        >
+          <!-- Bande de couleur gauche -->
+          <div class="color-strip"></div>
+
+          <div class="card-body">
+            <!-- Ligne 1 : badges + date -->
+            <div class="card-top">
+              <div class="badges">
+                <span class="badge-niveau" [class]="'badge-' + cssNiveau(n.niveauRisque)">
+                  {{ emoji(n.niveauRisque) }} {{ n.niveauRisque }}
+                </span>
+                <span class="badge-horizon">⏱ {{ n.horizonH }}h</span>
+                <span class="badge-proba">{{ (n.probabilite * 100).toFixed(0) }}%</span>
+              </div>
+              <div class="card-right">
+                <span class="date-tag">{{ n.heurePrediction | date:'dd/MM/yy HH:mm' }}</span>
+                <span class="unread-dot" *ngIf="!n.lue"></span>
+              </div>
+            </div>
+
+            <!-- Message principal -->
+            <p class="card-message">{{ n.message }}</p>
+
+            <!-- Détails -->
+            <div class="card-details">
+              <span class="detail-item">
+                <span class="detail-label">Zone</span>
+                <span class="detail-value">{{ n.zone }}</span>
+              </span>
+              <span class="detail-item">
+                <span class="detail-label">Opération</span>
+                <span class="detail-value">{{ n.operation }}</span>
+              </span>
+              <span class="detail-item">
+                <span class="detail-label">Durée estimée</span>
+                <span class="detail-value">{{ n.dureeEstimeeMin | number:'1.0-0' }} min</span>
+              </span>
+              <span class="detail-item">
+                <span class="detail-label">Cause probable</span>
+                <span class="detail-value cause">{{ n.raisonProbable }}</span>
+              </span>
+            </div>
+
+            <!-- Actions -->
+            <div class="card-actions">
+              <button class="btn-lire" *ngIf="!n.lue" (click)="marquerLue(n)">
+                ✓ Marquer lu
+              </button>
+              <button class="btn-delete" (click)="supprimer(n)">
+                🗑 Supprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>

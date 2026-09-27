@@ -1,0 +1,135 @@
+/* Conteneur principal */
+.modules-container {
+  width: 100%;
+  min-height: calc(100vh - 64px); /* Prend toute la hauteur sous la topbar */
+  padding: 60px 30px;
+  margin:0;
+  box-sizing: border-box;
+
+  /* AJOUT DE L'IMAGE */
+  background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.2)), 
+                    url('/assets/DSC09437.jpg'); /* Chemin de votre photo */
+  
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+/* En-tête de bienvenue */
+.welcome-header {
+  margin-bottom: 40px;
+  padding-left: 10px;
+}
+
+.welcome-header h1 {
+  font-size: 2.2rem;
+  color: #1a202c; /* Noir très profond */
+  font-weight: 800;
+  margin-bottom: 8px;
+}
+
+.welcome-header p {
+  color: #fff; 
+  font-weight: 800;
+  font-size: 1.5rem;
+}
+
+/* Grille de modules - 5 colonnes sur grand écran */
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+/* Style de la Carte */
+.module-card {
+  background: #000000ac;
+  border: 1.5px solid #edf2f7;
+  border-radius: 16px;
+  padding: 30px 25px;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  position: relative;
+  transition: all 0.3s ease;
+  min-height: 220px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+  border-color: #ffa770; /* Votre couleur orange au survol */
+  box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.08);
+}
+
+/* Icônes circulaires */
+.card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 25px;
+  position: relative;
+}
+
+.card-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Couleurs spécifiques des icônes (Pastels de l'image) */
+.dashboard-icon { background: #fff; color: #ffa770; } /* Bleu */
+.equip { background: #fff; color: #ffa770; }          /* Vert */
+.di { background: #fff; color: #ffa770; }             /* Orange */
+.otc { background: #fff; color: #ffa770; }            /* Violet */
+.otp { background: #fff; color: #ffa770; }            /* Jaune */
+.pdr { background: #fff; color: #ffa770; }            /* Bleu ciel */
+.users { background: #fff; color: #ffa770; }          /* Rose */
+
+/* Titre de la carte */
+.card-content h3 {
+  font-size: 1.15rem;
+  color: #fff;
+  font-weight: 700;
+  line-height: 1.4;
+  margin: 0;
+  max-width: 80%; /* Pour ne pas chevaucher la flèche */
+}
+
+/* Footer avec le bouton flèche circulaire */
+.card-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end; /* Aligne la flèche à droite */
+}
+
+.card-footer span:first-child {
+  display: none; /* Cache le texte "Accéder" pour coller à l'image */
+}
+
+.card-arrow {
+  width: 32px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffa770; /* Orange de votre logo */
+  font-size: 1.2rem;
+  transition: all 0.2s;
+}
+
+.module-card:hover .card-arrow {
+  background: #ffa770;
+  color: white;
+  border-color: #ffa770;
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

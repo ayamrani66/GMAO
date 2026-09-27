@@ -1,0 +1,194 @@
+.predictions-page {
+      padding: 24px;
+      max-width: 1100px;
+      margin: 0 auto;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .page-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #1e293b;
+      margin: 0 0 4px;
+    }
+    .title-icon { margin-right: 8px; }
+    .page-subtitle { margin: 0; font-size: 13px; color: #94a3b8; }
+
+    .header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+    .filter-tabs {
+      display: flex;
+      background: #f1f5f9;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .filter-tabs button {
+      background: none;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #64748b;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .filter-tabs button.active { background: #fff; color: #f97316; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+    .tab-count { background: #e2e8f0; color: #64748b; padding: 1px 6px; border-radius: 10px; font-size: 11px; }
+    .tab-count.unread { background: #fef3c7; color: #d97706; }
+
+    .btn-mark-all {
+      background: none;
+      border: 1px solid #f97316;
+      color: #f97316;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-mark-all:hover { background: #fff7ed; }
+
+    /* ── Stats ── */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid #f1f5f9;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .stat-number { font-size: 28px; font-weight: 800; }
+    .stat-label  { font-size: 12px; font-weight: 600; color: #64748b; }
+    .stat-card.critique .stat-number { color: #dc2626; }
+    .stat-card.modere   .stat-number { color: #d97706; }
+    .stat-card.faible   .stat-number { color: #16a34a; }
+    .stat-card.total    .stat-number { color: #f97316; }
+
+    /* ── Grid ── */
+    .notif-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* ── Carte ── */
+    .notif-card {
+      display: flex;
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,.05);
+      transition: box-shadow 0.2s;
+    }
+    .notif-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.09); }
+    .notif-card.unread { border-color: #fed7aa; background: #fff7ed; }
+
+    .color-strip { width: 5px; flex-shrink: 0; }
+    .niveau-critique .color-strip { background: #ef4444; }
+    .niveau-modere   .color-strip { background: #f59e0b; }
+    .niveau-faible   .color-strip { background: #22c55e; }
+
+    .card-body { flex: 1; padding: 16px 18px; min-width: 0; }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+    .badge-niveau {
+      font-size: 11px; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+    }
+    .badge-critique { background: #fee2e2; color: #dc2626; }
+    .badge-modere   { background: #fef3c7; color: #d97706; }
+    .badge-faible   { background: #dcfce7; color: #16a34a; }
+
+    .badge-horizon {
+      background: #ede9fe; color: #7c3aed;
+      font-size: 11px; font-weight: 600;
+      padding: 3px 9px; border-radius: 20px;
+    }
+    .badge-proba {
+      background: #f1f5f9; color: #475569;
+      font-size: 11px; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+    }
+
+    .card-right { display: flex; align-items: center; gap: 8px; }
+    .date-tag   { font-size: 12px; color: #94a3b8; }
+    .unread-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: #f97316; flex-shrink: 0;
+    }
+
+    .card-message {
+      font-size: 14px; font-weight: 500;
+      color: #1e293b; line-height: 1.5;
+      margin: 0 0 12px;
+    }
+
+    .card-details {
+      display: flex; flex-wrap: wrap; gap: 8px 20px;
+      margin-bottom: 14px;
+    }
+    .detail-item { display: flex; flex-direction: column; gap: 2px; }
+    .detail-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+    .detail-value { font-size: 13px; font-weight: 600; color: #334155; }
+    .detail-value.cause { color: #dc2626; }
+
+    .card-actions { display: flex; gap: 8px; }
+    .btn-lire {
+      background: #f97316; color: white;
+      border: none; padding: 6px 14px; border-radius: 7px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-lire:hover { background: #ea6c08; }
+    .btn-delete {
+      background: none; border: 1px solid #e2e8f0;
+      color: #94a3b8; padding: 6px 12px; border-radius: 7px;
+      font-size: 12px; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-delete:hover { border-color: #ef4444; color: #ef4444; }
+
+    /* ── États ── */
+    .empty-state {
+      text-align: center; padding: 60px 20px; color: #94a3b8;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+    .loading { padding: 40px; text-align: center; color: #94a3b8; }
+
+    @media (max-width: 600px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .page-header { flex-direction: column; }
+    }

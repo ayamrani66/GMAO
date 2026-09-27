@@ -1,0 +1,257 @@
+<div class="dashboard-wrapper">
+
+  <!-- ── Loading ──────────────────────────────────────────────────────── -->
+  <div *ngIf="loading" class="state-center">
+    <div class="spinner"></div>
+    <p>Chargement du tableau de bord…</p>
+  </div>
+
+  <!-- ── Erreur ──────────────────────────────────────────────────────── -->
+  <div *ngIf="error && !loading" class="state-center state-error">
+    <i class="ti ti-wifi-off"></i>
+    <p>Impossible de charger les données.</p>
+    <button (click)="startPolling()">Réessayer</button>
+  </div>
+
+  <!-- ── Contenu ──────────────────────────────────────────────────────── -->
+  <ng-container *ngIf="!loading && !error && stats">
+
+    <!-- En-tête -->
+    <div class="db-header">
+      <div>
+        <h1 class="db-title">Tableau de bord</h1>
+        <p class="db-sub">{{ today | titlecase }}</p>
+      </div>
+    </div>
+
+    <!-- ── KPI Cards ──────────────────────────────────────────────────── -->
+    <div class="kpi-grid">
+
+      <div class="kpi-card" style="--accent:#D4537E">
+        <i class="ti ti-bell-ringing kpi-icon" aria-hidden="true"></i>
+        <p class="kpi-label">DI ouvertes</p>
+        <p class="kpi-val">{{ stats.demandesOuvertes }}</p>
+        <p class="kpi-unit">demandes en attente</p>
+      </div>
+
+      <div class="kpi-card" style="--accent:#378ADD">
+        <i class="ti ti-clipboard-list kpi-icon" aria-hidden="true"></i>
+        <p class="kpi-label">OT Correctifsen cours</p>
+        <p class="kpi-val">{{ stats.interventionsEnCours }}</p>
+        <p class="kpi-unit">statut CRÉÉ</p>
+      </div>
+
+      <div class="kpi-card" style="--accent:#1D9E75">
+        <i class="ti ti-circle-check kpi-icon" aria-hidden="true"></i>
+        <p class="kpi-label">Terminés ce mois</p>
+        <p class="kpi-val">{{ stats.interventionsTermineesMois }}</p>
+        <p class="kpi-unit">OT clôturés</p>
+      </div>
+
+      <div class="kpi-card" style="--accent:#BA7517">
+  <i class="ti ti-gauge kpi-icon" aria-hidden="true"></i>
+  <p class="kpi-label">Taux de réalisation<br> PMP</p>
+  <p class="kpi-val">{{ stats.tauxRealisationPreventif }}%</p>
+  <p class="kpi-unit">OT préventifs terminés</p>
+</div>
+
+      <div class="kpi-card" style="--accent:#534AB7">
+  <i class="ti ti-gauge kpi-icon" aria-hidden="true"></i>
+  <p class="kpi-label">Taux de réalisation Correctif</p>
+  <p class="kpi-val">{{ stats.tauxRealisationCorrectif }}%</p>
+  <p class="kpi-unit">OT correctifs terminés</p>
+</div>
+
+<div class="kpi-card" style="--accent:#ffa770">
+        <i class="ti ti-tool kpi-icon" aria-hidden="true"></i>
+        <p class="kpi-label">Équipements</p>
+        <p class="kpi-val">{{ stats.totalEquipements }}</p>
+        <p class="kpi-unit">actifs dans le parc</p>
+      </div>
+
+    </div>
+
+    <!-- ── Graphiques ligne 1 ─────────────────────────────────────────── -->
+    <div class="charts-row">
+
+      <div class="card taux-card">
+        <p class="card-title"><i class="ti ti-gauge" aria-hidden="true"></i>Taux de réalisation</p>
+        <div class="taux-content">
+          <p class="taux-value">{{ stats.tauxRealisation }}%</p>
+          <div class="taux-bar"><div class="taux-bar-fill" [style.width.%]="stats.tauxRealisation"></div></div>
+          <p class="taux-sub">Global · OT terminés / OT créés</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="card-title">
+          <i class="ti ti-chart-donut" aria-hidden="true"></i>
+          Répartition OT
+        </p>
+        <div class="donut-wrapper">
+          <div echarts [options]="chartRepartition" class="chart-sm"></div>
+          <div class="donut-legend">
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#ffa770"></span>
+              Correctif&nbsp;
+              <strong>{{ stats.totalCorrectif }}</strong>
+            </div>
+            <div class="legend-item">
+              <span class="legend-dot" style="background:#378ADD"></span>
+              Préventif&nbsp;
+              <strong>{{ stats.totalPreventif }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Coût par zone ───────────────────────────────────────────────── -->
+    <div class="card mb">
+      <p class="card-title">
+        <i class="ti ti-building-factory" aria-hidden="true"></i>
+        Coût de maintenance par zone (top 10)
+      </p>
+      <div echarts [options]="chartCoutZone" class="chart-md"></div>
+    </div>
+
+    <!-- ── Stock + Alertes stock ──────────────────────────────────────── -->
+    <div class="two-col mb">
+
+      <!-- Stock summary -->
+      <div class="card">
+        <p class="card-title">
+          <i class="ti ti-package" aria-hidden="true"></i>
+          Stock PDR
+        </p>
+        <div class="stat-list">
+          <div class="stat-row">
+            <span>Total références</span>
+            <span class="stat-val">{{ stats.totalRefs }}</span>
+          </div>
+          <div class="stat-row">
+            <span>En rupture (stock = 0)</span>
+            <span class="stat-val danger">{{ stats.piecesEnRupture }}</span>
+          </div>
+          <div class="stat-row">
+            <span>Sous seuil minimal</span>
+            <span class="stat-val warn">{{ stats.piecesSousSeuil }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Alertes stock -->
+      <div class="card">
+        <p class="card-title">
+          <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+          Alertes stock critiques
+        </p>
+        <div *ngIf="stats.alertesStock.length === 0" class="empty-state">
+          <i class="ti ti-circle-check" aria-hidden="true"></i>
+          Aucune alerte stock
+        </div>
+        <table *ngIf="stats.alertesStock.length > 0" class="mini-table">
+          <thead>
+            <tr>
+              <th>Désignation</th>
+              <th class="col-num">Qté</th>
+              <th>Statut</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let a of stats.alertesStock">
+              <td class="nom-cell">{{ a.designation }}</td>
+              <td class="col-num mono">{{ a.quantiteStock }}</td>
+              <td>
+                <span [class]="'badge ' + statutClass(a.statut)">{{ a.statut }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ── Retards + À venir ──────────────────────────────────────────── -->
+    <div class="two-col">
+
+      <!-- En retard -->
+      <div class="card">
+        <p class="card-title">
+          <i class="ti ti-clock-exclamation" aria-hidden="true"></i>
+          Maintenances en retard
+        </p>
+        <div *ngIf="stats.maintenancesEnRetard.length === 0" class="empty-state">
+          <i class="ti ti-circle-check" aria-hidden="true"></i>
+          Aucun retard
+        </div>
+        <table *ngIf="stats.maintenancesEnRetard.length > 0" class="mini-table">
+          <thead>
+            <tr><th>Titre</th><th>Type</th><th class="col-num">Retard</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of stats.maintenancesEnRetard">
+              <td class="nom-cell"><span class="retard-dot"></span>{{ r.titre }}</td>
+              <td><span class="pill-type">{{ r.typeOT.substring(0,4) }}</span></td>
+              <td class="col-num">
+                <span [class]="'retard-badge ' + retardClass(r.joursRetard)">{{ r.joursRetard }} j</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- À venir -->
+      <div class="card">
+        <p class="card-title">
+          <i class="ti ti-calendar-check" aria-hidden="true"></i>
+          Maintenances à venir (7 j)
+        </p>
+        <div *ngIf="stats.maintenancesAVenir.length === 0" class="empty-state">
+          <i class="ti ti-calendar-off" aria-hidden="true"></i>
+          Aucune maintenance prévue
+        </div>
+        <table *ngIf="stats.maintenancesAVenir.length > 0" class="mini-table">
+          <thead>
+            <tr><th>Date</th><th>Titre</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of stats.maintenancesAVenir">
+              <td class="mono date-cell">{{ m.date }}</td>
+              <td class="nom-cell">{{ m.titre }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- ── OT terminés aujourd'hui ────────────────────────────────────── -->
+    <div *ngIf="stats.otTerminesAujourdhui.length > 0" class="card mt">
+      <p class="card-title">
+        <i class="ti ti-circle-check" aria-hidden="true"></i>
+        OT terminés aujourd'hui
+      </p>
+      <table class="mini-table">
+        <thead>
+          <tr>
+            <th>Zone / équipement</th>
+            <th>Type</th>
+            <th>Heure</th>
+            <th>Technicien</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let o of stats.otTerminesAujourdhui">
+            <td class="nom-cell">{{ o.equipementNom }}</td>
+            <td><span class="pill-type">{{ o.typeOT.substring(0,4) }}</span></td>
+            <td class="mono">{{ o.heureTerminaison }}</td>
+            <td>{{ o.technicien }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </ng-container>
+</div>

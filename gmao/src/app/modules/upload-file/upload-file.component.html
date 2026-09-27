@@ -1,0 +1,97 @@
+<div class="upload-section">
+
+  <div class="upload-label" *ngIf="!readonly">Documents joints</div>
+
+  <!-- Drop zone — masquée en readonly -->
+  <div *ngIf="!readonly"
+       class="drop-zone"
+       [class.dragging]="isDragging"
+       (dragover)="onDragOver($event)"
+       (dragleave)="onDragLeave()"
+       (drop)="onDrop($event)"
+       (click)="fileInput.click()">
+
+    <input #fileInput type="file"
+           accept=".pdf,.jpg,.jpeg,.png"
+           (change)="onFileSelected($event)"
+           style="display:none" />
+
+    <div class="drop-content" *ngIf="!uploading">
+      <div class="drop-icon">📎</div>
+      <p class="drop-text">Glissez un fichier ici ou <span>parcourir</span></p>
+      <p class="drop-hint">PDF, JPG, PNG acceptés</p>
+    </div>
+
+    <div class="uploading" *ngIf="uploading">
+      <div class="spinner"></div>
+      <span>Téléchargement en cours...</span>
+    </div>
+  </div>
+
+  <!-- Grille des documents -->
+  <div class="doc-grid" *ngIf="documents.length > 0">
+    <ng-container *ngFor="let doc of documents">
+
+      <!-- IMAGE -->
+      <div class="doc-preview-card" [class.pending]="doc._pending" *ngIf="isImage(doc.type)">
+        <img [src]="getViewUrl(doc)" [alt]="doc.nomFichier" (click)="openLightbox(doc)" />
+        <div class="doc-preview-footer">
+          <span class="doc-preview-name" [title]="doc.nomFichier">
+            {{ doc.nomFichier | slice:0:18 }}{{ doc.nomFichier.length > 18 ? '…' : '' }}
+          </span>
+          <span class="pending-icon" *ngIf="doc._pending" title="En attente">⏳</span>
+          <!-- Bouton supprimer masqué en readonly -->
+          <button *ngIf="!readonly" class="doc-delete-btn" title="Supprimer"
+                  (click)="deleteDocument(doc); $event.stopPropagation()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- PDF / autre fichier -->
+      <div class="doc-file-card" [class.pending]="doc._pending" *ngIf="!isImage(doc.type)">
+        <a [href]="doc._pending ? '#' : getDownloadUrl(doc)"
+           [target]="doc._pending ? '_self' : '_blank'"
+           class="doc-file-link">
+          <span class="doc-file-icon">{{ getFileIcon(doc.type) }}</span>
+          <span class="doc-file-name" [title]="doc.nomFichier">
+            {{ doc.nomFichier | slice:0:22 }}{{ doc.nomFichier.length > 22 ? '…' : '' }}
+          </span>
+          <svg *ngIf="!doc._pending" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </a>
+        <!-- Bouton supprimer masqué en readonly -->
+        <button *ngIf="!readonly" class="doc-delete-btn" title="Supprimer" (click)="deleteDocument(doc)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          </svg>
+        </button>
+      </div>
+
+    </ng-container>
+  </div>
+
+  <!-- État vide -->
+  <div class="doc-empty" *ngIf="documents.length === 0 && !uploading">
+    Aucun document joint
+  </div>
+
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" *ngIf="lightboxUrl" (click)="lightboxUrl = null">
+  <img [src]="lightboxUrl" alt="Aperçu" />
+  <button class="lightbox-close" (click)="lightboxUrl = null; $event.stopPropagation()">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <line x1="18" y1="6" x2="6" y2="18"/>
+      <line x1="6" y1="6" x2="18" y2="18"/>
+    </svg>
+  </button>
+</div>

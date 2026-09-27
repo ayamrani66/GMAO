@@ -1,0 +1,11 @@
+<h2>Équipements Archivés</h2>
+
+<ul>
+  <li *ngFor="let e of equipements" style="margin-bottom: 15px; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+    <strong>{{ e.codeEquipement }}</strong> - {{ e.libelle }}<br/>
+    <em>Cause :</em> {{ e.causeArchivage }}<br/>
+    <button type="button" (click)="dearchiver(e)">Restaurer</button>
+  </li>
+</ul>
+
+<p *ngIf="equipements.length === 0">Aucun équipement archivé.</p>

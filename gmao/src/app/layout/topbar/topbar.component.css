@@ -1,0 +1,249 @@
+.topbar {
+  height: 64px;
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.topbar-left, .topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background: #e2e8f0;
+  margin: 0 4px;
+}
+
+.hub-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 12px;
+  background: transparent;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.brand-text {
+  font-size: 1.3rem;
+  font-family: 'Montserrat', sans-serif;
+font-weight: 800;
+  letter-spacing: -1.5px; /* Look Logo resserré */
+  text-transform: uppercase;
+  background: #95969e;
+  color: #ffa770; 
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0px 2px 2px rgba(0, 0, 0, 0.05));
+  padding-right: 5px; 
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0);
+}
+
+/* Optionnel : Effet au survol du lien parent */
+.hub-link:hover .brand-text {
+  /* Au survol, on inverse ou on illumine l'orange */
+  background: linear-gradient(135deg, #ffa770 0%, #ff8c42 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: all 0.4s ease;
+}
+
+/* Design de l'icône à côté */
+.hub-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffa770; 
+  transition: transform 0.3s ease;
+}
+
+.hub-link:hover .hub-icon {
+  transform: rotate(90deg); /* Rotation de l'icône au survol */
+}
+
+.logo-img {
+  height: 38px;
+  width: auto;
+}
+.action-item {
+  position: relative; /* Indispensable pour placer le dropdown par rapport au bouton */
+}
+
+/* Boutons d'action */
+.icon-btn {
+  background: none;
+  border: none;
+  color: #ffa770;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+}
+
+.icon-btn:hover {
+  background: #f1f5f9;
+  color: #ffa770;
+}
+
+.badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ffffff;
+}
+
+/* Dropdown Notifications */
+.dropdown-menu {
+  position: absolute;
+  top: 60px;
+  right: 0;
+  width: 320px;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  animation: slideIn 0.2s ease-out;
+}
+
+.notif-menu {
+  position: absolute;
+  top: 60px; /* Ajustez selon la hauteur de votre topbar */
+  right: 0;
+  width: 300px;
+  background: #fff; /* Fond solide noir/gris pour trancher */
+  border: 1px solid #333;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  z-index: 1000; /* Assure que le menu passe devant tout le monde */
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-header {
+  padding: 12px 16px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.dropdown-header a {
+  color: #3b82f6;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.notif-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.notif-item.unread {
+  background: #eff6ff;
+  border-left: 3px solid #3b82f6;
+}
+
+.notif-item p {
+  margin: 0;
+  font-size: 13px;
+  color: #1e293b;
+}
+
+.notif-item .time {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+/* Profil */
+.profile-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.profile-section:hover {
+  background: #f8fafc;
+}
+
+.avatar {
+  width: 36px;
+  height: 36px;
+  background: #95969e;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.user-role {
+  font-size: 11px;
+  color: #64748b;
+  text-transform: capitalize;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: #fee2e2;
+  color: #ef4444;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

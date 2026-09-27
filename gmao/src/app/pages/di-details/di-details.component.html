@@ -1,0 +1,228 @@
+<div class="di-container">
+
+  <div class="loading-overlay" *ngIf="loading">
+    <div class="spinner"></div>
+    <span>Chargement des données...</span>
+  </div>
+
+  <ng-container *ngIf="!loading && di">
+
+    <header class="action-bar">
+      <div class="action-bar-left">
+        <button class="btn-secondary" (click)="retour()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Retour
+        </button>
+        <div class="meta-title">
+          <h1>{{ di.codeDI }}</h1>
+      <span class="status-indicator" [ngClass]="getStatutClass(di.statut)">
+        {{ formatStatut(di.statut) }}
+      </span>
+        </div>
+      </div>
+      <div class="action-bar-right" *ngIf="roleService.hasRole('RESPONSABLE', 'MANAGER') && di.statut === 'Cree'">
+    <button class="btn-success" (click)="ouvrirModalValidation()">Valider</button>
+    <button class="btn-danger" (click)="ouvrirModalRejet()">Rejeter</button>
+  </div>
+    </header>
+
+    <main class="workspace-grid">
+
+      <aside class="workspace-sidebar">
+        <section class="panel" *ngIf="di.statut === 'Validee'">
+  <div class="panel-header">
+    <h2>Ordre de travail généré</h2>
+  </div>
+  <div class="panel-body text-sm">
+    <ng-container *ngIf="ot">
+      <div class="kv-pair">
+        <span class="kv-label">Code OT</span>
+        <span class="kv-value technical">{{ ot.codeOT }}</span>
+      </div>
+      <div class="kv-pair">
+        <span class="kv-label">Statut</span>
+        <span class="badge" [ngClass]="getOtStatutClass(ot.statut)">{{ formatOtStatut(ot.statut) }}</span>
+      </div>
+      <button class="btn-secondary" style="margin-top: 10px; width: 100%;" (click)="voirOT()">
+        Voir l'OT →
+      </button>
+    </ng-container>
+    <p *ngIf="!ot" class="text-muted">Aucun OT lié pour le moment.</p>
+  </div>
+</section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Informations de la demande</h2>
+          </div>
+          <div class="panel-body text-sm">
+            <div class="kv-pair">
+              <span class="kv-label">Identifiant</span>
+              <span class="kv-value technical">{{ di.codeDI }}</span>
+            </div>
+            <div class="kv-pair">
+              <span class="kv-label">Date d'émission</span>
+              <span class="kv-value">{{ di.dateDemande | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+            <div class="kv-pair">
+              <span class="kv-label">Émis par</span>
+              <span class="kv-value">{{ di.demandeur?.nomComplet || di.demandeur?.username || '—' }}</span>
+            </div>
+            <div class="kv-pair">
+              <span class="kv-label">Canal d'origine</span>
+              <span class="kv-value font-medium">{{ di.source || '—' }}</span>
+            </div>
+            <div class="kv-pair">
+              <span class="kv-label">Priorité</span>
+              <span class="priority-flag" [ngClass]="getPrioriteClass(di.priorite)">{{ di.priorite }}</span>
+            </div>
+            <div class="kv-pair" *ngIf="di.dateValidation">
+              <span class="kv-label">Date validation</span>
+              <span class="kv-value">{{ di.dateValidation | date:'dd/MM/yyyy HH:mm' }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Équipement cible</h2>
+          </div>
+          <div class="panel-body text-sm">
+            <div class="kv-pair">
+              <span class="kv-label">Code machine</span>
+              <span class="kv-value technical">{{ di.equipement?.codeEquipement || '—' }}</span>
+            </div>
+            <div class="kv-pair">
+              <span class="kv-label">Désignation</span>
+              <span class="kv-value font-medium">{{ di.equipement?.libelle || '—' }}</span>
+            </div>
+            <div class="kv-pair">
+              <span class="kv-label">Localisation</span>
+              <span class="kv-value text-muted">{{ di.equipement?.localisation || '—' }}</span>
+            </div>
+            <div class="kv-pair">
+              <span class="kv-label">Index criticité</span>
+              <span class="kv-value">{{ di.equipement?.criticite || '—' }}</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel panel-alert" *ngIf="di.statut === 'Rejetee'">
+          <div class="panel-header">
+            <h2>Motif de refus</h2>
+          </div>
+          <div class="panel-body text-sm">
+            <p class="alert-text">{{ di.causeRejet || 'Aucun motif renseigné.' }}</p>
+          </div>
+        </section>
+
+      </aside>
+
+      <div class="workspace-content">
+
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Détails du dysfonctionnement</h2>
+          </div>
+          <div class="panel-body">
+            <div class="data-group">
+              <span class="group-label">Nature du problème</span>
+              <div class="tag-neutral">{{ di.natureAnomalie || 'Non spécifiée' }}</div>
+            </div>
+
+            <div class="data-group">
+              <span class="group-label">Description des symptômes</span>
+              <div class="raw-text-container">
+                {{ di.description || 'Aucune description fournie.' }}
+              </div>
+            </div>
+
+            <div class="data-group">
+              <span class="group-label">Expression du besoin</span>
+              <div class="raw-text-container">
+                {{ di.besoin || 'Aucune exigence particulière spécifiée.' }}
+              </div>
+            </div>
+
+            <div class="data-group" *ngIf="di.affectationTechnicien">
+              <span class="group-label">Intervenant désigné</span>
+              <div class="operator-assignment">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>{{ affectationLabels[di.affectationTechnicien] || di.affectationTechnicien }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ✅ Remplacement de di.documents par FileUploadComponent -->
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Documentation & Preuves</h2>
+          </div>
+          <div class="panel-body">
+           <app-file-upload [diId]="di.id" [readonly]="true"></app-file-upload>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </ng-container>
+
+  <div class="modal-overlay" *ngIf="showValidationModal || showRejetModal" (click)="fermerModalValidation(); fermerModalRejet()">
+
+  <div class="modal-card" *ngIf="showValidationModal" (click)="$event.stopPropagation()">
+    <h3>Valider la DI</h3>
+
+    <div class="alert-error" *ngIf="validationError">
+      <i class="fa-solid fa-circle-exclamation"></i> {{ validationError }}
+    </div>
+
+    <div class="form-group">
+      <label>Titre de l'OT <span class="required">*</span></label>
+      <input type="text" class="col-filter-input"
+             [(ngModel)]="titreOT"
+             placeholder="Saisir le titre de l'ordre de travail...">
+    </div>
+
+    <div class="role-grid">
+      <button *ngFor="let r of rolesTechnicien" class="role-btn"
+              [class.selected]="affectationChoisie === r.value"
+              (click)="affectationChoisie = r.value">
+        {{ r.label }}
+      </button>
+    </div>
+    <div class="modal-footer">
+      <button (click)="fermerModalValidation()">Annuler</button>
+      <button class="btn-success" (click)="confirmerValidation()">Confirmer</button>
+    </div>
+  </div>
+
+  <div class="modal-card" *ngIf="showRejetModal" (click)="$event.stopPropagation()">
+    <h3>Rejeter la DI</h3>
+
+    <div class="alert-error" *ngIf="rejetError">
+      <i class="fa-solid fa-circle-exclamation"></i> {{ rejetError }}
+    </div>
+
+    <textarea [(ngModel)]="causeRejet" class="textarea-cause" placeholder="Motif du rejet..."></textarea>
+    <div class="modal-footer">
+      <button (click)="fermerModalRejet()">Annuler</button>
+      <button class="btn-danger" (click)="confirmerRejet()">Confirmer Rejet</button>
+    </div>
+  </div>
+
+</div>
+  <div class="fallback-state" *ngIf="!loading && !di">
+    <div class="fallback-icon">!</div>
+    <h2>Référence introuvable</h2>
+    <p>La demande d'intervention demandée n'existe pas ou vous ne possédez pas les droits d'accès requis.</p>
+    <button class="btn-secondary" (click)="retour()">Retour à la liste</button>
+  </div>
+
+</div>

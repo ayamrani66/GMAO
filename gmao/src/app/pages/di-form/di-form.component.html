@@ -1,0 +1,147 @@
+<div class="form-page">
+
+  <div class="form-header">
+    <div class="header-accent"></div>
+    <div style="flex: 1">
+      <p class="form-label-top">{{ editMode ? 'Modifier la demande' : 'Nouvelle demande' }}</p>
+      <h2>
+        <ng-container *ngIf="editMode">Modifier DI #{{ editDiId }}</ng-container>
+        <ng-container *ngIf="!editMode && !savedDiId">Créer une DI</ng-container>
+        <ng-container *ngIf="savedDiId">DI #{{ savedDiId }} enregistrée ✅</ng-container>
+      </h2>
+    </div>
+  </div>
+
+  <div class="form-body">
+    <ng-container *ngIf="!savedDiId">
+
+      <!-- Erreur -->
+      <div class="alert-error" *ngIf="errorMessage">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {{ errorMessage }}
+      </div>
+
+      <!-- ══ Équipement avec Arborescence ══════════════════════════════════════════ -->
+<div class="section-label">Équipement</div>
+
+<div class="field-row">
+  <label class="field-label">Équipement <span class="required">*</span></label>
+  <div class="field-control" style="grid-column: span 3; position: relative;">
+    
+    <div class="search-input-wrapper">
+      <span class="search-icon">🔍</span>
+      <input class="field-input custom-autocomplete-input" 
+             type="text"
+             placeholder="Rechercher dans l'arborescence..."
+             [(ngModel)]="searchEquipement"
+             (input)="filterTree()"
+             (focus)="showTree = true" />
+      <button type="button" class="clear-btn" *ngIf="searchEquipement" 
+              (click)="searchEquipement=''; di.equipementId=null">×</button>
+    </div>
+
+    <!-- Dropdown avec Arbre -->
+    <div class="custom-dropdown-list tree-dropdown" *ngIf="showTree">
+      <ng-container *ngTemplateOutlet="treeTemplate; context:{ $implicit: nodes }"></ng-container>
+    </div>
+
+    <!-- Template récursif -->
+    <ng-template #treeTemplate let-list>
+      <ul class="tree-root">
+        <li *ngFor="let node of list" class="tree-node">
+          <div class="tree-item-content" (click)="selectNode(node)">
+            <!-- Flèche de déploiement -->
+            <span class="tree-arrow" 
+                  *ngIf="node.children && node.children.length > 0"
+                  (click)="toggleNode(node, $event)"
+                  [class.expanded]="node.isExpanded">
+              ▶
+            </span>
+            <span class="tree-spacer" *ngIf="!node.children || node.children.length === 0"></span>
+            
+            <span class="node-label">{{ node.libelle }}</span>
+            <span class="node-code">{{ node.codeEquipement }}</span>
+          </div>
+          
+          <!-- Rendu des enfants -->
+          <div class="tree-children" *ngIf="node.isExpanded && node.children.length > 0">
+            <ng-container *ngTemplateOutlet="treeTemplate; context:{ $implicit: node.children }"></ng-container>
+          </div>
+        </li>
+      </ul>
+    </ng-template>
+
+    <div class="dropdown-backdrop" *ngIf="showTree" (click)="showTree = false"></div>
+  </div>
+</div>
+
+      <!-- ══ Anomalie ════════════════════════════════════════════ -->
+      <div class="section-label">Anomalie</div>
+
+      <!-- Nature | Priorité -->
+      <div class="field-row">
+        <label class="field-label">Nature d'Anomalie <span class="required">*</span></label>
+        <div class="field-control">
+          <select class="field-select" [(ngModel)]="di.natureAnomalie">
+            <option [ngValue]="null" disabled>-- Sélectionner --</option>
+            <option *ngFor="let n of naturesAnomalie" [value]="n">{{ n }}</option>
+          </select>
+        </div>
+
+        <label class="field-label">Priorité</label>
+        <div class="field-control">
+          <select class="field-select" [(ngModel)]="di.priorite">
+            <option *ngFor="let p of priorites" [value]="p">{{ p }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Besoin | Source -->
+      <div class="field-row">
+        <label class="field-label">Besoin <span class="required">*</span></label>
+        <div class="field-control">
+          <input class="field-input" type="text"
+            [(ngModel)]="di.besoin"
+            placeholder="Ex: Remplacement du joint, inspection..." />
+        </div>
+
+        <label class="field-label">Source</label>
+        <div class="field-control">
+          <select class="field-select" [(ngModel)]="di.source">
+            <option *ngFor="let s of sources" [value]="s">{{ s }}</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="field-full">
+        <label class="field-label" style="display:block; margin-bottom: 10px;">
+          Description <span class="required">*</span>
+        </label>
+        <textarea class="field-textarea"
+          [(ngModel)]="di.description"
+          placeholder="Décrivez le problème constaté..."
+          rows="4"></textarea>
+      </div>
+
+      <!-- Upload fichiers — création : savedDiId | édition : editDiId -->
+      <div class="field-full">
+        <app-file-upload [diId]="editMode ? editDiId : savedDiId"></app-file-upload>
+      </div>
+
+      <!-- Actions -->
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="annuler()">Annuler</button>
+        <button class="btn-submit" (click)="save()">
+          <i class="ti ti-{{ editMode ? 'device-floppy' : 'plus' }}"></i>
+          {{ editMode ? 'Enregistrer les modifications' : 'Créer la DI' }}
+        </button>
+      </div>
+
+    </ng-container>
+  </div>
+</div>

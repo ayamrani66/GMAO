@@ -1,0 +1,260 @@
+<div class="ot-detail-page" *ngIf="!loading && ot">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <button class="btn" (click)="goBack()">← Retour</button>
+    <div class="top-bar-center">
+      <span class="code-ot">{{ ot.codeOT }}</span>
+      <span class="type-badge correctif">Maintenance Corrective</span>
+    </div>
+    <button class="btn btn-primary" (click)="printOT()">Imprimer PDF</button>
+  </div>
+
+  <!-- 1. INFOS DI -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">Demande d'Intervention</div></div>
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Code DI</span>
+          <span class="info-value">{{ ot.di?.codeDI || '—' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Créé par</span>
+          <span class="info-value">{{ ot.superviseur?.nomComplet || '—' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Priorité</span>
+          <span class="prio-badge" [ngClass]="'prio-' + (ot.di?.priorite | lowercase)">
+            {{ ot.di?.priorite || '—' }}
+          </span>
+        </div>
+        <div class="info-item span-2">
+          <span class="info-label">Description de l'anomalie</span>
+          <span class="info-value">{{ ot.di?.description || '—' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. INFOS OT -->
+  <div class="card">
+    <div class="card-header"><div class="card-title">Détails de l'Ordre de Travail</div></div>
+    <div class="card-body">
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">Équipement</span>
+          <span class="info-value">{{ ot.zone?.libelle || '—' }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Nature de l'anomalie</span>
+          <span class="info-value">{{ formatNature(ot.natureAnomalie) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Technicien affecté</span>
+          <span class="info-value">{{ formatRole(ot.affectationTechnicien) }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Durée intervention</span>
+          <span class="info-value">
+            {{ ot.dureeIntervention ? (ot.dureeIntervention + ' min') : '—' }}
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label" *ngIf="roleService.hasRole('RESPONSABLE')">Coût intervention</span>
+          <span class="info-value">
+            {{ ot.coutIntervention ? (ot.coutIntervention | number:'1.2-2') + ' MAD' : '—' }}
+          </span>
+        </div>
+        <div class="info-item" *ngIf="ot.dateCloture">
+          <span class="info-label">Date de clôture</span>
+          <span class="info-value">{{ formatDate(ot.dateCloture) }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. RAPPORT D'INTERVENTION -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Rapport d'intervention</div>
+      <span class="statut-chip statut-{{ ot.statut }}">{{ formatStatut(ot.statut) }}</span>
+    </div>
+    <div class="card-body">
+
+      <!-- STATUT -->
+      <div class="form-group">
+        <label class="form-label">Statut</label>
+        <div class="field-display" *ngIf="saved">{{ formatStatut(feedback.statut) }}</div>
+        <select class="form-control" [(ngModel)]="feedback.statut"
+                *ngIf="!saved" [disabled]="!isEditable()">
+          <option *ngFor="let s of getStatutsDisponibles()" [value]="s"
+                  [disabled]="s === 'Termine' && !feedback.dateFinIntervention">
+            {{ formatStatut(s) }}{{ s === 'Termine' && !feedback.dateFinIntervention ? ' (date de fin requise)' : '' }}
+          </option>
+        </select>
+      </div>
+
+      <!-- DATES -->
+      <div class="info-grid" style="margin-bottom:20px">
+        <div class="form-group">
+          <label class="form-label">Date de début</label>
+          <div class="field-display" *ngIf="saved">
+            {{ feedback.dateDebutIntervention ? formatDateDisplay(feedback.dateDebutIntervention) : '—' }}
+          </div>
+          <input type="datetime-local" class="form-control"
+                 [(ngModel)]="feedback.dateDebutIntervention" *ngIf="!saved">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date de fin</label>
+          <div class="field-display" *ngIf="saved">
+            {{ feedback.dateFinIntervention ? formatDateDisplay(feedback.dateFinIntervention) : '—' }}
+          </div>
+          <input type="datetime-local" class="form-control"
+                 [(ngModel)]="feedback.dateFinIntervention" *ngIf="!saved">
+        </div>
+      </div>
+
+      <!-- PDR CONSOMMÉES -->
+      <div class="form-section">
+        <label class="section-label">Pièces de rechange consommées</label>
+
+        <div class="pdr-list" *ngIf="feedback.piecesConsommees.length > 0">
+          <div class="pdr-row" *ngFor="let p of feedback.piecesConsommees; let i = index">
+            <span class="code-chip">{{ getPdrNom(p.pieceRechangeId) }}</span>
+            <span class="pdr-qty">× {{ p.quantiteConsommee }}</span>
+            <button class="btn-remove-pdr" (click)="removePdr(i)" *ngIf="!saved" title="Retirer">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="text-muted small"
+             *ngIf="feedback.piecesConsommees.length === 0 && saved">
+          Aucune pièce consommée enregistrée.
+        </div>
+
+        <div class="pdr-add-row" *ngIf="!saved">
+          <select [(ngModel)]="newPdr.pieceRechangeId" class="form-select">
+            <option [ngValue]="null">— Sélectionner une pièce —</option>
+            <option *ngFor="let p of pdrList" [ngValue]="p.id"
+                    [disabled]="p.stockActuel < p.stockMin">
+              {{ p.code }} — {{ p.nom }}
+              {{ p.stockActuel < p.stockMin ? ' (stock insuffisant)' : '' }}
+            </option>
+          </select>
+          <input type="number" [(ngModel)]="newPdr.quantiteConsommee"
+                 placeholder="Qté" min="1" class="form-input qty-input" />
+          <button class="btn-add-pdr" (click)="addPdr()"
+                  [disabled]="!newPdr.pieceRechangeId || !newPdr.quantiteConsommee">
+            + Ajouter
+          </button>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-group">
+        <label class="form-label">Actions réalisées</label>
+
+        <!-- Mode lecture -->
+        <div class="actions-display" *ngIf="saved">
+          <span class="action-tag" *ngFor="let a of feedback.actions">{{ a }}</span>
+          <span class="info-value" *ngIf="!feedback.actions.length">—</span>
+        </div>
+
+        <!-- Mode édition -->
+        <div *ngIf="!saved">
+          <!-- Tags existants -->
+          <div class="action-tags-list" style="display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+            <span class="action-tag" *ngFor="let a of feedback.actions; let i = index"
+                  style="display:inline-flex; align-items:center; gap:4px;">
+              {{ a }}
+              <button type="button" class="tag-remove" (click)="removeAction(i)">×</button>
+            </span>
+          </div>
+          <!-- Input + bouton ajouter -->
+          <div style="display:flex; gap:8px;">
+            <input class="form-control tag-input-field"
+                   [(ngModel)]="actionInput"
+                   (keyup.enter)="addAction()"
+                   placeholder="Décrire une action réalisée…"
+                   style="flex:1" />
+            <button type="button" class="btn btn-secondary" (click)="addAction()"
+                    [disabled]="!actionInput.trim()">
+              + Ajouter
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- DOCUMENTS -->
+      <div class="form-group">
+        <label class="form-label">Documents / OT Renseigné</label>
+
+        <div class="docs-grid" *ngIf="ot.otReseignes && ot.otReseignes.length > 0">
+          <div class="doc-card" *ngFor="let doc of ot.otReseignes" (click)="openDocument(doc)">
+            <ng-container *ngIf="isImage(doc.nomFichier)">
+              <img class="doc-img" [src]="getDocUrl(doc)" [alt]="doc.nomFichier" loading="lazy">
+            </ng-container>
+            <ng-container *ngIf="!isImage(doc.nomFichier)">
+              <div class="doc-pdf-thumb">📄</div>
+            </ng-container>
+            <span class="doc-name">{{ doc.nomFichier }}</span>
+          </div>
+        </div>
+
+        <div class="file-upload-zone" [class.drag-over]="isDragOver"
+             (dragover)="onDragOver($event)"
+             (dragleave)="isDragOver = false"
+             (drop)="onDrop($event)">
+          <input type="file" multiple accept="image/*,.pdf" (change)="onFileSelect($event)">
+          <p>Cliquez ou glissez l'OT scanné ici</p>
+        </div>
+
+        <div *ngFor="let f of selectedFiles; let i = index"
+             class="action-tag" style="margin-top:5px;display:inline-flex;margin-right:6px;gap:4px;">
+          {{ f.name }}
+          <button type="button" (click)="removeFile(i)">×</button>
+        </div>
+      </div>
+
+      <!-- Warning Terminé sans date fin -->
+      <div class="hint-warning"
+           *ngIf="feedback.statut === 'Termine' && !feedback.dateFinIntervention">
+        ⚠️ Renseignez la date de fin pour pouvoir terminer cet OT.
+      </div>
+
+      <!-- Boutons -->
+      <div class="form-actions">
+        <button class="btn btn-primary" style="width:100%"
+                (click)="submitFeedback()"
+                [disabled]="saving || !canSubmit()"
+                *ngIf="!saved">
+          {{ saving ? 'Enregistrement…' : 'Enregistrer le rapport' }}
+        </button>
+        <button class="btn btn-secondary" style="width:100%"
+                (click)="enableEdit()"
+                *ngIf="saved && isEditable()">
+          ✏️ Modifier le rapport
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center;padding:60px;color:#718096" *ngIf="loading">
+  Chargement…
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" *ngIf="lightboxDoc" (click)="closeLightbox()">
+  <div class="lightbox-inner" (click)="$event.stopPropagation()">
+    <button class="lightbox-close" (click)="closeLightbox()">✕</button>
+    <img [src]="lightboxDoc" alt="Document">
+  </div>
+</div>

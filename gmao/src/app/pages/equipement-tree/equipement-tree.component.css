@@ -1,0 +1,253 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@400;500;600&display=swap');
+
+/* ── NODE WRAPPER ── */
+.tree-node {
+  position: relative;
+}
+
+/* ── ROW ── */
+.node-content {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.12s ease, border-color 0.12s ease;
+  border: 1px solid transparent;
+  font-family: 'DM Sans', sans-serif;
+  position: relative;
+}
+
+.node-content:hover {
+  background: #f8f8fa;
+  border-color: #eeeeef;
+}
+
+/* ── CHEVRON ── */
+.chevron-wrap {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.chevron-icon {
+  width: 13px;
+  height: 13px;
+  color: #c0c1c8;
+  transition: transform 0.18s ease, color 0.18s ease;
+}
+
+.chevron-icon.rotate {
+  transform: rotate(90deg);
+  color: #ffa770;
+}
+
+.chevron-placeholder {
+  width: 13px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+/* ── EQUIPMENT ICON ── */
+.node-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  background: #f3f3f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.12s ease;
+  color: #95969e;
+}
+
+.node-content:hover .node-icon {
+  background: #ebebee;
+}
+
+/* ── CODE ── */
+.node-code {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 0.2px;
+  cursor: default;   
+  padding: 2px 6px;
+  border-radius: 5px;
+  transition: background 0.12s ease;
+  flex-shrink: 0;
+}
+
+.node-code:hover {
+  background: #fff3ec;
+}
+
+/* ── SEPARATOR ── */
+.node-sep {
+  color: #d5d6dc;
+  font-size: 14px;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+/* ── LABEL ── */
+.node-libelle {
+  font-size: 18px;
+  font-weight: 400;
+  color: #3a3b42;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── SPACER ── */
+.node-spacer {
+  flex: 1;
+}
+
+/* ── LOCALISATION ── */
+.node-localisation {
+  font-size: 14px;
+  color: #b0b1b8;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.node-localisation svg {
+  color: #c5c6cc;
+  flex-shrink: 0;
+}
+
+/* ── CRITICITÉ BADGE ── */
+.criticite-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.1px;
+  flex-shrink: 0;
+}
+
+.badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.criticite-badge.faible {
+  background: #eef7ee;
+  color: #4a8c4a;
+}
+.criticite-badge.faible .badge-dot {
+  background: #5aab5a;
+}
+
+.criticite-badge.moyenne {
+  background: #fff6e8;
+  color: #b07a1a;
+}
+.criticite-badge.moyenne .badge-dot {
+  background: #e0952a;
+}
+
+.criticite-badge.elevee {
+  background: #fef0ee;
+  color: #c0432a;
+}
+.criticite-badge.elevee .badge-dot {
+  background: #e0532a;
+}
+
+/* ── CHILDREN COUNT ── */
+.children-count {
+  font-size: 11px;
+  font-weight: 500;
+  color: #a0a1a8;
+  background: #f0f0f3;
+  border-radius: 10px;
+  padding: 1px 7px;
+  min-width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── CONTEXT MENU ── */
+.ctx-menu {
+  background: #ffffff;
+  border: 1px solid #e5e5e8;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  min-width: 140px;
+  z-index: 100;
+}
+
+.ctx-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 400;
+  color: #3a3b42;
+  background: transparent;
+  border: none;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.1s ease;
+  text-align: left;
+}
+
+.ctx-item:hover {
+  background: #f5f5f8;
+}
+
+.ctx-item-danger {
+  color: #c0432a;
+}
+
+.ctx-item-danger:hover {
+  background: #fef5f3;
+}
+
+/* ── CHILDREN BLOCK ── */
+.children {
+  margin-top: 1px;
+  padding-left: 20px;
+  position: relative;
+}
+
+/* Vertical connector line */
+.children::before {
+  content: '';
+  position: absolute;
+  left: 19px;
+  top: 0;
+  bottom: 8px;
+  width: 1px;
+  background: #ebebee;
+  pointer-events: none;
+}
+.node-code.clickable {
+  color: var(--primary-color); /* Couleur de lien (ex: bleu) */
+  cursor: pointer;             /* Curseur main */
+  text-decoration: none;
+}
+
+.node-code.clickable:hover {
+  text-decoration: underline; /* Souligné au survol */
+}

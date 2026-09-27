@@ -1,0 +1,139 @@
+<div class="rm-wrapper">
+  <!-- Header -->
+  <header class="rm-header">
+    <div class="header-content">
+      <h1>Gestion des utilisateurs</h1>
+      <p>Assignez les accès et définissez les spécialités techniques.</p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-card">
+        <span class="label">Total</span>
+        <span class="value">{{ totalCount }}</span>
+      </div>
+      <div class="stat-card pending" *ngIf="pendingCount > 0">
+        <span class="label">À traiter</span>
+        <span class="value">{{ pendingCount }}</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Bannière d'erreur -->
+  <div class="error-banner" *ngIf="errorMessage">
+    <i class="fa-solid fa-triangle-exclamation"></i>
+    <span>{{ errorMessage }}</span>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="rm-toolbar">
+    <div class="search-bar">
+      <i class="fa-solid fa-magnifying-glass"></i>
+      <input type="text" placeholder="Rechercher un membre..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()">
+    </div>
+
+    <div class="filter-group">
+      <button *ngFor="let f of filterOptions"
+              (click)="filterRole = f; onFilterChange()"
+              [class.active]="filterRole === f">
+        {{ f === 'ALL' ? 'Tous' : getRoleLabel(f) }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Table Container -->
+  <div class="table-container">
+
+    <!-- Chargement -->
+    <div class="table-loading" *ngIf="loading">
+      <div class="loader"></div>
+      <span>Chargement des utilisateurs...</span>
+    </div>
+
+    <table class="rm-main-table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>Membre</th>
+          <th>Contact & Inscription</th>
+          <th>Rôle actuel</th>
+          <th>Action / Attribution</th>
+          <th class="text-center">Statut</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers" [class.is-new]="user.role === 'PENDING'" [class.is-saved]="successId === user.id">
+          <!-- Utilisateur -->
+          <td>
+            <div class="user-profile">
+              <div class="avatar" [attr.data-letter]="user.nomComplet.charAt(0)"></div>
+              <div class="details">
+                <span class="name">{{ user.nomComplet }}</span>
+                <span class="email">{{ user.mail }}</span>
+              </div>
+            </div>
+          </td>
+
+          <!-- Contact & Date -->
+          <td>
+            <div class="contact-info">
+              <span class="phone"><i class="fa-solid fa-phone"></i> {{ user.telephone || '—' }}</span>
+              <span class="date"><i class="fa-solid fa-calendar"></i> {{ user.createdAt | date:'dd MMM yyyy' }}</span>
+            </div>
+          </td>
+
+          <!-- Badge Rôle -->
+          <td>
+            <span class="badge" [ngClass]="getRoleBadgeClass(user.role)">
+              {{ getRoleLabel(user.role) }}
+            </span>
+            <div class="tech-badge" *ngIf="user.role === 'SUPERVISEUR' && user.roleTechnicien">
+              <i class="fa-solid fa-microchip"></i> {{ getRoleTechnicienLabel(user.roleTechnicien) }}
+            </div>
+          </td>
+
+          <!-- Inputs -->
+          <td>
+            <div class="action-stack">
+              <div class="select-box">
+                <select [ngModel]="user.role" (ngModelChange)="assignRole(user, $event)">
+                  <option *ngFor="let r of roles" [value]="r">{{ getRoleLabel(r) }}</option>
+                </select>
+                <i class="fa-solid fa-chevron-down"></i>
+              </div>
+
+              <!-- Select Spécialité (Conditionnel) -->
+              <div class="select-box special" *ngIf="user.role === 'SUPERVISEUR'">
+                <select [(ngModel)]="pendingRoleTechnicien[user.id]" (ngModelChange)="confirmSuperviseur(user)">
+                  <option value="" disabled selected>Choisir une spécialité...</option>
+                  <option *ngFor="let rt of rolesTechnicien" [value]="rt">{{ getRoleTechnicienLabel(rt) }}</option>
+                </select>
+                <i class="fa-solid fa-wrench"></i>
+              </div>
+
+              <span class="warning-text" *ngIf="user.role === 'SUPERVISEUR' && !user.roleTechnicien && !pendingRoleTechnicien[user.id]">
+                <i class="fa-solid fa-triangle-exclamation"></i> Spécialité requise
+              </span>
+            </div>
+          </td>
+
+          <!-- Statut -->
+          <td class="text-center">
+            <div class="status-indicator">
+              <div class="loader small" *ngIf="savingId === user.id"></div>
+              <i class="fa-solid fa-circle-check success" *ngIf="successId === user.id"></i>
+              <span class="idle-dot" *ngIf="savingId !== user.id && successId !== user.id"></span>
+            </div>
+          </td>
+        </tr>
+
+        <!-- État vide -->
+        <tr *ngIf="filteredUsers.length === 0" class="empty-row">
+          <td colspan="5">
+            <div class="empty-state">
+              <i class="fa-solid fa-user-slash"></i>
+              <span>Aucun utilisateur ne correspond à cette recherche.</span>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

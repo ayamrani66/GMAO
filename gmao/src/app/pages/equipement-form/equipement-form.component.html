@@ -1,0 +1,156 @@
+<div class="form-page">
+
+  <div class="form-header">
+    <div class="header-accent"></div>
+    <div>
+      <p class="form-label-top">{{ isEdit ? 'Modifier' : 'Nouvel équipement' }}</p>
+      <h2>{{ isEdit ? 'Modifier l\'équipement' : 'Créer un équipement' }}</h2>
+    </div>
+  </div>
+
+  <div class="form-body">
+
+    <!-- Alertes -->
+    <div class="alert-error" *ngIf="errorMessage">
+      <i class="fa-solid fa-circle-xmark"></i> {{ errorMessage }}
+    </div>
+
+    <div class="success-block" *ngIf="savedEquipementId">
+      <span>✅</span>
+      <span>Équipement {{ isEdit ? 'modifié' : 'créé' }} avec succès</span>
+    </div>
+
+    <ng-container *ngIf="!savedEquipementId">
+
+      <!-- ══ Identification ══════════════════════════════════════ -->
+      <div class="section-label">Identification</div>
+
+      <!-- Code équipement | Code parent -->
+      <div class="field-row">
+
+        <label class="field-label">Code Équipement <span class="required">*</span></label>
+<div class="field-control">
+  <input class="field-input" type="text"
+         [ngModel]="equipement.codeEquipement"
+         (ngModelChange)="onCodeChange($event)"
+         name="codeEquipement" placeholder="Ex: ASU-PR-MT-GL1" required />
+</div>
+
+        <label class="field-label">
+  Code parent
+</label>
+<div class="field-control">
+  <input class="field-input field-readonly" 
+         type="text"
+         [ngModel]="equipement.codeParent"
+         name="codeParent"
+         placeholder="Généré automatiquement..." 
+         readonly />
+
+  <div class="error-hint" *ngIf="parentChecking">
+    <i class="fa-solid fa-spinner fa-spin"></i> Vérification du parent...
+  </div>
+  <div class="error-hint" *ngIf="equipement.codeParent && !parentExists && !parentChecking">
+    <i class="fa-solid fa-circle-xmark"></i> Structure invalide : Le parent structurel <strong>{{ equipement.codeParent }}</strong> n'existe pas en base de données.
+  </div>
+  <div class="success-hint" *ngIf="equipement.codeParent && parentExists && !parentChecking">
+    <i class="fa-solid fa-circle-check"></i> Parent structurel validé ({{ equipement.codeParent }})
+  </div>
+        </div>
+        </div>
+
+      <!-- Libellé | Niveau -->
+      <div class="field-row">
+
+        <label class="field-label">Libellé</label>
+        <div class="field-control">
+          <input class="field-input" type="text"
+            [(ngModel)]="equipement.libelle"
+            name="libelle"
+            placeholder="Nom de l'équipement"
+            required />
+            <div class="field-error" *ngIf="submitted && !equipement.libelle?.trim()">
+  <i class="fa-solid fa-circle-exclamation"></i> Le libellé est obligatoire
+</div>
+        </div>
+
+        <label class="field-label">
+  Niveau
+</label>
+<div class="field-control">
+  <input class="field-input field-readonly"
+         type="number"
+         [(ngModel)]="equipement.niveau"
+         name="niveau"
+         readonly />
+</div>
+
+      </div>
+
+      <!-- ══ Localisation & suivi ════════════════════════════════ -->
+      <div class="section-label">Localisation & suivi</div>
+
+      <!-- Localisation | Compteur -->
+      <div class="field-row">
+
+        <label class="field-label">Localisation</label>
+        <div class="field-control">
+          <input class="field-input" type="text"
+            [(ngModel)]="equipement.localisation"
+            name="localisation"
+            placeholder="Atelier A, Salle B..." />
+        </div>
+
+        <label class="field-label">Compteur</label>
+        <div class="field-control">
+          <input class="field-input" type="number"
+            [(ngModel)]="equipement.compteur"
+            name="compteur"
+            placeholder="0" />
+        </div>
+
+      </div>
+
+      <!-- ══ Paramètres ══════════════════════════════════════════ -->
+      <div class="section-label">Paramètres</div>
+
+      <!-- Criticité | Date d'installation -->
+<div class="field-row">
+
+  <label class="field-label">Criticité</label>
+  <div class="field-control">
+    <select class="field-select" [(ngModel)]="equipement.criticite" name="criticite">
+      <option *ngFor="let c of criticites" [value]="c">{{ c }}</option>
+    </select>
+  </div>
+
+  <label class="field-label">
+    Date d'installation
+    <span class="auto" *ngIf="!isEdit">automatique</span>
+  </label>
+  <div class="field-control">
+    <input class="field-input" [class.field-readonly]="!isEdit" type="date"
+      [(ngModel)]="equipement.dateInstallation"
+      name="dateInstallation"
+      [readonly]="!isEdit" />
+  </div>
+
+</div>
+
+      <!-- ══ Pièces jointes — 100% largeur ══════════════════════ -->
+      <div class="field-full" *ngIf="!isEdit || equipement.id">
+  <app-file-upload [equipementId]="equipement.id"></app-file-upload>
+</div>
+
+      <div class="form-actions">
+        <button class="btn-cancel" (click)="annuler()">Annuler</button>
+        <button class="btn-submit" (click)="save()">
+          <i class="fa-solid fa-floppy-disk"></i>
+          {{ isEdit ? 'Enregistrer les modifications' : 'Créer l\'équipement' }}
+        </button>
+      </div>
+
+    </ng-container>
+
+  </div>
+</div>

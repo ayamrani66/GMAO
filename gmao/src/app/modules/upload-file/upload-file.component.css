@@ -1,0 +1,210 @@
+/* upload-file.component.css */
+
+/* ── Label ── */
+.upload-label {
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--text-muted, #95969e);
+  margin-bottom: 10px;
+}
+
+/* ── Drop zone ── */
+.drop-zone {
+  border: 2px dashed var(--border, #e8e9ef);
+  border-radius: 12px;
+  padding: 24px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .18s, background .18s;
+  background: var(--surface, #f9fafb);
+  margin-bottom: 16px;
+}
+.drop-zone:hover,
+.drop-zone.dragging {
+  border-color: var(--orange, #ffa770);
+  background: var(--orange-light, #fff3ec);
+}
+
+.drop-icon   { font-size: 1.6rem; margin-bottom: 6px; }
+.drop-text   { font-size: 0.84rem; color: var(--text-mid, #6b6f80); margin: 0 0 4px; }
+.drop-text span { color: var(--orange-dark, #ff8a47); font-weight: 600; text-decoration: underline; }
+.drop-hint   { font-size: 0.72rem; color: var(--text-light, #c8cad4); margin: 0; }
+
+.uploading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.84rem;
+  color: var(--text-mid, #6b6f80);
+}
+
+/* Spinner upload */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid var(--border, #e8e9ef);
+  border-top-color: var(--orange, #ffa770);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Grille documents ── */
+.doc-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* ── Carte image ── */
+.doc-preview-card {
+  position: relative;
+  width: 200px;
+  border: 1.5px solid var(--border, #e8e9ef);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--white, #fff);
+  transition: box-shadow .18s;
+}
+.doc-preview-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.doc-preview-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  display: block;
+  cursor: zoom-in;
+  transition: transform .2s;
+}
+.doc-preview-card img:hover { transform: scale(1.04); }
+
+.doc-preview-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 8px;
+  border-top: 1px solid var(--border-soft, #f0f1f6);
+}
+
+.doc-preview-name {
+  font-size: 0.68rem;
+  color: var(--text-muted, #95969e);
+  font-family: 'Manrope', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
+}
+
+/* ── Carte fichier ── */
+.doc-file-card {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border: 1.5px solid var(--blue-border, #bfdbfe);
+  border-radius: 99px;
+  background: var(--blue-bg, #eff6ff);
+  overflow: hidden;
+  height: 32px;
+  transition: box-shadow .15s;
+}
+.doc-file-card:hover { box-shadow: 0 2px 8px rgba(29,78,216,.12); }
+
+.doc-file-link {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px 0 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--blue-color, #1d4ed8);
+  text-decoration: none;
+  flex: 1;
+  white-space: nowrap;
+}
+.doc-file-icon { font-size: 0.85rem; }
+
+/* ── Bouton suppression (partagé image + fichier) ── */
+.doc-delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--text-muted, #95969e);
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: background .14s, color .14s;
+  margin-right: 3px;
+}
+.doc-delete-btn:hover {
+  background: var(--error-bg, #fee2e2);
+  color: var(--error-color, #dc2626);
+}
+
+/* ── Vide ── */
+.doc-empty {
+  font-size: 0.8rem;
+  color: var(--text-light, #c8cad4);
+  font-style: italic;
+  font-family: 'Manrope', sans-serif;
+  padding: 4px 0;
+}
+
+/* ── Lightbox ── */
+.lightbox {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.88);
+  display: flex; align-items: center; justify-content: center;
+  cursor: zoom-out;
+  animation: fade-lb .18s ease;
+}
+.lightbox img {
+  max-width: 92vw; max-height: 90vh;
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+}
+.lightbox-close {
+  position: absolute; top: 20px; right: 20px;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.1);
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 10px; cursor: pointer; color: #fff;
+  transition: background .15s;
+}
+.lightbox-close:hover { background: rgba(255,255,255,0.22); }
+
+@keyframes fade-lb { from { opacity: 0; } to { opacity: 1; } }
+/* Fichier en attente — léger overlay orange */
+.doc-preview-card.pending,
+.doc-file-card.pending {
+  opacity: 0.75;
+  border-color: var(--orange, #ffa770);
+}
+
+/* Badge attente */
+.pending-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: var(--orange-dark, #ff8a47);
+  background: var(--orange-light, #fff3ec);
+  border: 1px solid var(--orange, #ffa770);
+  border-radius: 8px;
+  padding: 7px 12px;
+  margin-bottom: 12px;
+}
+
+.pending-icon {
+  font-size: 0.75rem;
+}

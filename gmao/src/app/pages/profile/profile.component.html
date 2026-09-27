@@ -1,0 +1,333 @@
+<div class="list-page">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       HEADER
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Mon Profil</h1>
+      <p>Consultez et gérez vos informations personnelles</p>
+    </div>
+    <div class="header-right">
+      <button class="btn-primary" (click)="openEditModal()">
+        <i class="fa-solid fa-pen-to-square"></i>
+        Modifier le profil
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PROFILE CARD
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="profile-card">
+
+    <!-- Avatar + identité -->
+    <div class="profile-identity">
+      <div class="avatar-large">{{ initials }}</div>
+      <div class="profile-name-block">
+        <h2 class="profile-name">{{ user?.nomComplet }}</h2>
+        <div class="profile-badges">
+          <span class="badge" [ngClass]="getRoleBadgeClass(user?.role)">
+            {{ getRoleLabel(user?.role) }}
+          </span>
+          <span class="badge badge-orange" *ngIf="user?.roleTechnicien">
+            {{ user?.roleTechnicien }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats + contact -->
+    <div class="profile-meta">
+      <div class="meta-item">
+        <span class="meta-label"><i class="fa-solid fa-envelope"></i> Email</span>
+        <span class="meta-value">{{ user?.mail }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label"><i class="fa-solid fa-phone"></i> Téléphone</span>
+        <span class="meta-value">{{ user?.telephone || '—' }}</span>
+      </div>
+      <div class="meta-divider"></div>
+      <div class="meta-item">
+        <span class="meta-label"><i class="fa-solid fa-file-lines"></i> DI créées</span>
+        <span class="meta-stat">{{ demandes.length }}</span>
+      </div>
+      <div class="meta-item">
+        <span class="meta-label"><i class="fa-solid fa-wrench"></i> OT assignés</span>
+        <span class="meta-stat">{{ ordres.length }}</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TABS
+  ════════════════════════════════════════════════════════════════ -->
+  <div class="profile-tabs">
+    <button class="profile-tab" [class.active]="activeTab === 'di'" (click)="setTab('di')">
+      <i class="fa-solid fa-file-lines"></i>
+      Demandes d'intervention
+      <span class="tab-count">{{ demandes.length }}</span>
+    </button>
+    <button class="profile-tab" [class.active]="activeTab === 'ot'" (click)="setTab('ot')">
+      <i class="fa-solid fa-wrench"></i>
+      Ordres de travail
+      <span class="tab-count">{{ ordres.length }}</span>
+    </button>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TAB DI
+  ════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'di'">
+    <div class="table-card" *ngIf="demandes.length > 0; else noDi">
+      <table>
+        <thead>
+          <tr>
+            <th>N° DI</th>
+            <th>Date</th>
+            <th>Priorité</th>
+            <th>Nature d'anomalie</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let di of demandes" (click)="goToDetailDi(di)">
+            <td><span class="code-chip">{{ di.codeDI || '#' + di.id }}</span></td>
+            <td class="td-date">{{ di.dateDemande | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td><span class="badge" [ngClass]="getPrioriteClass(di.priorite)">{{ di.priorite }}</span></td>
+            <td><span>{{ di.natureAnomalie }}</span></td>
+            <td><span class="badge" [ngClass]="getDiStatutClass(di.statut)">{{ formatStatutDi(di.statut) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noDi>
+      <div class="empty-state">
+        <i class="fa-solid fa-folder-open"></i>
+        <p>Aucune demande d'intervention</p>
+      </div>
+    </ng-template>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       TAB OT
+  ════════════════════════════════════════════════════════════════ -->
+  <div *ngIf="activeTab === 'ot'">
+    <div class="table-card" *ngIf="ordres.length > 0; else noOt">
+      <table>
+        <thead>
+          <tr>
+            <th>N° OT</th>
+            <th>Type</th>
+            <th>Nature d'anomalie</th>
+            <th>Affectation technicien</th>
+            <th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ot of ordres" (click)="goToDetail(ot)">
+            <td><span class="code-chip">{{ ot.codeOT || '#' + ot.id }}</span></td>
+            <td>{{ ot.typeOT }}</td>
+            <td>{{ ot.natureAnomalie }}</td>
+            <td>{{ affectationLabels[ot.affectationTechnicien] }}</td>
+            <td><span class="badge" [ngClass]="getOtStatutClass(ot.statut)">{{ formatStatut(ot.statut) }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #noOt>
+      <div class="empty-state">
+        <i class="fa-solid fa-folder-open"></i>
+        <p>Aucun ordre de travail</p>
+      </div>
+    </ng-template>
+  </div>
+
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODAL MODIFIER PROFIL
+════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="profile-modal" (click)="$event.stopPropagation()">
+
+    <!-- Header modal -->
+    <div class="profile-modal-header">
+      <div class="header-accent"></div>
+      <div style="flex:1">
+        <p class="form-label-top">Profil utilisateur</p>
+        <h3>Modifier le profil</h3>
+      </div>
+      <button class="modal-close-btn" (click)="closeEditModal()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Body modal -->
+    <div class="profile-modal-body">
+
+      <!-- Alertes -->
+      <div class="alert-success" *ngIf="editSuccess">
+        <i class="fa-solid fa-circle-check"></i> {{ editSuccess }}
+      </div>
+      <div class="alert-error" *ngIf="editError">
+        <i class="fa-solid fa-circle-xmark"></i> {{ editError }}
+      </div>
+
+      <!-- ── Infos personnelles ────────────────────────────────── -->
+      <div class="section-label">Informations personnelles</div>
+
+      <!-- Nom | Téléphone -->
+      <div class="field-row">
+
+        <label class="field-label">Nom complet</label>
+        <div class="field-control">
+          <input class="field-input"
+            type="text"
+            [(ngModel)]="editForm.nomComplet"
+            name="nomComplet"
+            placeholder="Jean Dupont" />
+          <div class="error-hint" *ngIf="!editForm.nomComplet && formTouched">
+            <i class="fa-solid fa-triangle-exclamation"></i> Champ requis
+          </div>
+        </div>
+
+        <label class="field-label">Téléphone</label>
+        <div class="field-control">
+          <input class="field-input"
+            type="text"
+            [(ngModel)]="editForm.telephone"
+            name="telephone"
+            placeholder="+212 6xx xxx xxx" />
+        </div>
+
+      </div>
+
+      <!-- ── Mot de passe ──────────────────────────────────────── -->
+      <div class="section-label">
+        Mot de passe
+        <span style="font-size:0.65rem; font-weight:400; text-transform:none; letter-spacing:0; color:var(--text-muted); margin-left:4px;">— optionnel</span>
+      </div>
+
+      <!-- Ancien mot de passe -->
+      <div class="field-row">
+        <label class="field-label">Ancien mot de passe</label>
+        <div class="field-control" style="grid-column: span 3; border-right:none; padding-right:0;">
+          <div class="pwd-input-wrap">
+            <input class="field-input"
+              [type]="showOldPwd ? 'text' : 'password'"
+              [(ngModel)]="editForm.oldPassword"
+              name="oldPassword"
+              placeholder="••••••••"
+              (ngModelChange)="onOldPwdChange()" />
+            <button type="button" class="pwd-toggle" (click)="showOldPwd = !showOldPwd">
+              <i class="fa-solid" [class.fa-eye]="!showOldPwd" [class.fa-eye-slash]="showOldPwd"></i>
+            </button>
+          </div>
+          <div class="error-hint" *ngIf="pwdErrors.oldRequired">
+            <i class="fa-solid fa-triangle-exclamation"></i> Requis pour changer le mot de passe
+          </div>
+        </div>
+      </div>
+
+      <!-- Nouveau | Confirmer -->
+      <div class="field-row">
+
+        <label class="field-label">Nouveau mot de passe</label>
+        <div class="field-control">
+          <div class="pwd-input-wrap">
+            <input class="field-input"
+              [type]="showNewPwd ? 'text' : 'password'"
+              [(ngModel)]="editForm.newPassword"
+              name="newPassword"
+              placeholder="••••••••"
+              (ngModelChange)="onNewPwdChange($event)" />
+            <button type="button" class="pwd-toggle" (click)="showNewPwd = !showNewPwd">
+              <i class="fa-solid" [class.fa-eye]="!showNewPwd" [class.fa-eye-slash]="showNewPwd"></i>
+            </button>
+          </div>
+
+          <!-- Barre de force -->
+          <div class="strength-bar" *ngIf="editForm.newPassword">
+            <div class="strength-track">
+              <div class="strength-fill"
+                [class.weak]="pwdStrength === 'weak'"
+                [class.medium]="pwdStrength === 'medium'"
+                [class.strong]="pwdStrength === 'strong'"
+                [style.width]="(pwdScore * 25) + '%'">
+              </div>
+            </div>
+            <span class="strength-label"
+              [class.weak]="pwdStrength==='weak'"
+              [class.medium]="pwdStrength==='medium'"
+              [class.strong]="pwdStrength==='strong'">
+              {{ pwdStrength === 'weak' ? 'Faible' : pwdStrength === 'medium' ? 'Moyen' : 'Fort' }}
+            </span>
+          </div>
+
+          <!-- Critères -->
+          <ul class="pwd-criteria" *ngIf="editForm.newPassword">
+            <li [class.ok]="pwdCriteria.length"    [class.ko]="!pwdCriteria.length">
+              <i class="fa-solid" [class.fa-check]="pwdCriteria.length" [class.fa-xmark]="!pwdCriteria.length"></i> 8 caractères min.
+            </li>
+            <li [class.ok]="pwdCriteria.uppercase" [class.ko]="!pwdCriteria.uppercase">
+              <i class="fa-solid" [class.fa-check]="pwdCriteria.uppercase" [class.fa-xmark]="!pwdCriteria.uppercase"></i> Une majuscule
+            </li>
+            <li [class.ok]="pwdCriteria.number"    [class.ko]="!pwdCriteria.number">
+              <i class="fa-solid" [class.fa-check]="pwdCriteria.number" [class.fa-xmark]="!pwdCriteria.number"></i> Un chiffre
+            </li>
+            <li [class.ok]="pwdCriteria.special"   [class.ko]="!pwdCriteria.special">
+              <i class="fa-solid" [class.fa-check]="pwdCriteria.special" [class.fa-xmark]="!pwdCriteria.special"></i> Un caractère spécial
+            </li>
+          </ul>
+
+          <div class="error-hint" *ngIf="pwdErrors.sameAsOld">
+            <i class="fa-solid fa-triangle-exclamation"></i> Doit être différent de l'ancien
+          </div>
+        </div>
+
+        <label class="field-label" *ngIf="editForm.newPassword">Confirmer</label>
+        <div class="field-control" *ngIf="editForm.newPassword">
+          <div class="pwd-input-wrap">
+            <input class="field-input"
+              [type]="showConfirmPwd ? 'text' : 'password'"
+              [(ngModel)]="editForm.confirmPassword"
+              name="confirmPassword"
+              placeholder="••••••••" />
+            <button type="button" class="pwd-toggle" (click)="showConfirmPwd = !showConfirmPwd">
+              <i class="fa-solid" [class.fa-eye]="!showConfirmPwd" [class.fa-eye-slash]="showConfirmPwd"></i>
+            </button>
+          </div>
+          <div class="error-hint"
+            *ngIf="editForm.confirmPassword && editForm.confirmPassword !== editForm.newPassword">
+            <i class="fa-solid fa-triangle-exclamation"></i> Ne correspondent pas
+          </div>
+          <div class="success-hint"
+            *ngIf="editForm.confirmPassword && editForm.confirmPassword === editForm.newPassword">
+            <i class="fa-solid fa-check"></i> Correspondent
+          </div>
+        </div>
+
+        <!-- Placeholders vides si newPassword pas encore saisi -->
+        <ng-container *ngIf="!editForm.newPassword">
+          <div></div><div></div>
+        </ng-container>
+
+      </div>
+
+    </div>
+
+    <!-- Footer modal -->
+    <div class="profile-modal-footer">
+      <button class="btn-cancel" (click)="closeEditModal()">Annuler</button>
+      <button class="btn-submit" (click)="saveProfile()" [disabled]="saving">
+        <i class="fa-solid fa-spinner fa-spin" *ngIf="saving"></i>
+        <i class="fa-solid fa-floppy-disk" *ngIf="!saving"></i>
+        {{ saving ? 'Enregistrement...' : 'Enregistrer' }}
+      </button>
+    </div>
+
+  </div>
+</div>

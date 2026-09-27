@@ -1,0 +1,148 @@
+<div class="ot-page">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Pièces de Rechange</h1>
+      <p>{{ filtered.length }} pièce{{ filtered.length > 1 ? 's' : '' }} au total</p>
+    </div>
+  </div>
+
+  <!-- ALERTES -->
+  <div class="alert-error" *ngIf="errorMsg" style="margin-bottom:12px">{{ errorMsg }}</div>
+  <div class="alert-success" *ngIf="successMsg" style="margin-bottom:12px">{{ successMsg }}</div>
+
+  <!-- Alerte stock bas global -->
+  <div class="alert-warning" *ngIf="countStockBas() > 0" style="margin-bottom:12px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+    {{ countStockBas() }} pièce{{ countStockBas() > 1 ? 's' : '' }} en stock bas.
+    <button class="link-btn" (click)="filterStock = 'bas'; applyFilter()">Voir</button>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="filters-bar">
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Rechercher par nom ou code..."
+             [(ngModel)]="searchTerm" (input)="applyFilter()" />
+    </div>
+    <div class="filter-chips">
+      <button class="filter-chip" [class.active]="filterStock === 'all'"
+              (click)="filterStock = 'all'; applyFilter()">Tous</button>
+      <button class="filter-chip badge-warning" [class.active]="filterStock === 'bas'"
+              (click)="filterStock = 'bas'; applyFilter()">Stock bas</button>
+      <button class="filter-chip badge-green" [class.active]="filterStock === 'ok'"
+              (click)="filterStock = 'ok'; applyFilter()">Stock OK</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" *ngIf="loading">
+    <svg class="spin" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+    </svg>
+    Chargement...
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-card" *ngIf="!loading">
+    <table *ngIf="filtered.length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Unité</th>
+          <th>Stock min</th>
+          <th>Stock max</th>
+          <th>Stock actuel</th>
+          <th>Prix unitaire</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pdr of filtered" [class.row-warning]="isStockBas(pdr)">
+          <td><span class="code-chip">{{ pdr.code }}</span></td>
+          <td>{{ pdr.nom }}</td>
+          <td><span class="type-chip">{{ getSymbole(pdr.unite) }}</span></td>
+          <td>{{ pdr.stockMin ?? '—' }}</td>
+          <td>{{ pdr.stockMax ?? '—' }}</td>
+          <td>
+            <span class="badge" [ngClass]="isStockBas(pdr) ? 'badge-red' : 'badge-green'">
+              {{ pdr.stockActuel ?? '—' }}
+            </span>
+          </td>
+          <td>
+            <span *ngIf="pdr.prixUnitaire">{{ pdr.prixUnitaire | number:'1.2-2' }} MAD</span>
+            <span *ngIf="!pdr.prixUnitaire" class="text-muted">—</span>
+          </td>
+          <td class="td-actions">
+            <a [routerLink]="['/pieces-rechange', pdr.id, 'modifier']" class="action-btn edit" title="Modifier">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </a>
+            <button class="action-btn reject" title="Supprimer" (click)="confirmDelete(pdr)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6"/><path d="M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <div class="empty-state">
+        <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M4.93 4.93a10 10 0 0 0 0 14.14"/>
+        </svg>
+        <p>Aucune pièce de rechange trouvée.</p>
+      </div>
+    </ng-template>
+  </div>
+</div>
+
+<!-- MODAL SUPPRESSION -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="cancelDelete()"></div>
+<div class="modal-box" *ngIf="showDeleteModal">
+  <div class="modal-head">
+    <div>
+      <p class="modal-label">Attention</p>
+      <h4 class="modal-title">Confirmer la suppression</h4>
+    </div>
+    <button class="modal-close" (click)="cancelDelete()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p style="font-size:0.88rem; color:var(--text-mid); line-height:1.5; margin:0;">
+      Voulez-vous supprimer la pièce
+      <strong style="color:var(--text-dark)">{{ pdrToDelete?.nom }}</strong>
+      <span class="code-chip" style="margin-left:4px">{{ pdrToDelete?.code }}</span> ?<br/>
+      <span style="color:var(--error-color); font-size:0.8rem;">Cette action est irréversible.</span>
+    </p>
+  </div>
+  <div class="modal-foot">
+    <button class="btn-cancel" (click)="cancelDelete()">Annuler</button>
+    <button class="btn-confirm" style="background:#dc2626; box-shadow:0 3px 12px rgba(220,38,38,.3);"
+            (click)="confirmDeleteAction()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      </svg>
+      Supprimer
+    </button>
+  </div>
+</div>

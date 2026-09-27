@@ -1,0 +1,91 @@
+<div class="tree-node" [class.has-children]="filteredChildren.length > 0">
+
+  <div class="node-content"
+       (click)="toggle()"
+       (contextmenu)="onRightClick($event, equipement)">
+
+    <!-- Chevron -->
+    <span class="chevron-wrap" *ngIf="filteredChildren.length > 0">
+      <svg class="chevron-icon" [class.rotate]="equipement.expanded"
+           width="13" height="13" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </span>
+    <span class="chevron-placeholder" *ngIf="filteredChildren.length === 0"></span>
+
+    <!-- Code cliquable -->
+    <span class="node-code" 
+      [class.clickable]="!roleService.isSuperviseur()"
+      (click)="!roleService.isSuperviseur() ? goToHistorique() : null; $event.stopPropagation()">
+  {{ equipement.libelle }}
+</span>
+
+    <span class="node-sep">·</span>
+
+    <!-- Libellé -->
+    <span class="node-libelle">{{ equipement.codeEquipement }}</span>
+
+    <span class="node-spacer"></span>
+
+    <!-- Localisation -->
+    <span class="node-localisation" *ngIf="equipement.localisation">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+        <circle cx="12" cy="10" r="3"/>
+      </svg>
+      {{ equipement.localisation }}
+    </span>
+
+    <!-- Badge criticité -->
+    <span class="criticite-badge"
+          [class.faible]="equipement.criticite === 'Faible'"
+          [class.moyenne]="equipement.criticite === 'Moyenne'"
+          [class.elevee]="equipement.criticite === 'Elevee'"
+          *ngIf="equipement.criticite">
+      <span class="badge-dot"></span>
+      {{ equipement.criticite }}
+    </span>
+
+    <!-- Compteur enfants -->
+    <span class="children-count" *ngIf="filteredChildren.length > 0">
+      {{ filteredChildren.length }}
+    </span>
+
+  </div>
+
+  <!-- Menu contextuel -->
+  <ng-template #menu>
+    <div class="ctx-menu">
+      <button class="ctx-item" *ngIf="roleService.isResponsable()" (click)="modifierEquipement(equipement)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+        Modifier
+      </button>
+      <button class="ctx-item ctx-item-danger" *ngIf="roleService.isResponsable()" (click)="archiverEquipement(equipement)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2">
+          <polyline points="21 8 21 21 3 21 3 8"/>
+          <rect x="1" y="3" width="22" height="5"/>
+          <line x1="10" y1="12" x2="14" y2="12"/>
+        </svg>
+        Archiver
+      </button>
+    </div>
+  </ng-template>
+
+  <!-- Enfants avec ligne verticale -->
+  <div class="children" *ngIf="equipement.expanded">
+    <app-equipement-tree
+  *ngFor="let child of filteredChildren"
+  [equipement]="child"
+  [allEquipements]="allEquipements"
+  [searchTerm]="searchTerm">   <!-- ← ajouter -->
+</app-equipement-tree>
+  </div>
+
+</div>

@@ -1,0 +1,58 @@
+<div class="notif-page">
+      <div class="page-header">
+        <div class="header-left">
+          <h1>Notifications</h1>
+          <p>
+            {{ notifications.length }} notification{{ notifications.length > 1 ? 's' : '' }}
+            <span *ngIf="unreadCount > 0"> — <strong class="unread-count">{{ unreadCount }} non lue{{ unreadCount > 1 ? 's' : '' }}</strong></span>
+          </p>
+        </div>
+        <button class="btn-primary" (click)="marquerToutesLues()" *ngIf="unreadCount > 0">
+          Tout marquer comme lu
+        </button>
+      </div>
+
+      <div class="filters">
+        <button
+          *ngFor="let f of filterOptions"
+          class="filter-btn"
+          [class.active]="activeFilter === f.value"
+          (click)="setFilter(f.value)">
+          {{ f.label }}
+          <span class="filter-badge" *ngIf="f.value === 'nonLues' && unreadCount > 0">{{ unreadCount }}</span>
+        </button>
+      </div>
+
+      <div class="table-card">
+        <div *ngIf="loading" class="loading-state">Chargement...</div>
+
+        <div *ngIf="!loading && filteredNotifications.length === 0" class="empty-state">
+          <p>Aucune notification</p>
+        </div>
+
+        <div *ngFor="let n of filteredNotifications"
+             class="notif-row"
+             [class.unread]="!n.lu"
+             [class.read]="n.lu">
+          <div class="notif-content">
+            <span *ngIf="!n.lu"></span>
+            <span class="notif-dot-placeholder" *ngIf="n.lu"></span>
+            <div class="notif-body">
+              <span class="notif-message">
+                {{ n.message }}
+              </span>
+              <!-- Remplace ton span actuel par : -->
+<span class="notif-ot clickable"
+      *ngIf="getLienLabel(n)"
+      (click)="naviguerDepuisMessage(n)">
+  {{ getLienLabel(n) }}
+</span>
+            </div>
+          </div>
+          <div class="notif-right">
+            <span class="read-indicator" *ngIf="n.lu"></span>
+            <span class="notif-date">{{ n.dateCreation | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>

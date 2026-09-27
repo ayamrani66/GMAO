@@ -1,0 +1,61 @@
+<div class="container mt-4">
+
+  <div class="header">
+    <h2>{{ showArchives ? 'Équipements Archivés' : 'Liste des équipements' }}</h2>
+    <button (click)="toggleArchives()">
+      {{ showArchives ? 'Retour aux équipements' : 'Équipements archivés' }}
+    </button>
+  </div>
+
+  <!-- Vue archives -->
+  <div *ngIf="showArchives">
+  <ul>
+    <li *ngFor="let e of archivedEquipements">
+      <div class="arch-info">
+        <div>
+          <p class="arch-libelle"> <span>{{ e.codeEquipement }}</span>: {{ e.libelle }}</p>
+          <p class="arch-cause">Cause : <span>{{ e.causeArchivage }}</span></p>
+        </div>
+      </div>
+      <button type="button" (click)="dearchiver(e)">
+        <i class="ti ti-rotate"></i> Restaurer
+      </button>
+    </li>
+  </ul>
+  <p *ngIf="archivedEquipements.length === 0" class="empty-state">
+    Aucun équipement archivé.
+  </p>
+</div>
+
+<!-- Vue normale -->
+<div *ngIf="!showArchives">
+  <div class="search-container">
+    <div class="search-box">
+  <span class="search-icon">🔍</span>
+  <input
+    type="text"
+    placeholder="Rechercher un équipement..."
+    [value]="searchTerm"
+    (input)="onSearchChange($event)"
+    class="search-input"
+  />
+</div>
+  </div>
+
+  <!-- ✅ On affiche TOUJOURS l'arborescence -->
+  <div class="tree-container">
+    <app-equipement-tree
+  *ngFor="let r of racines"
+  [equipement]="r"
+  [allEquipements]="equipements"
+  [searchTerm]="searchTerm">   <!-- ← ajouter -->
+</app-equipement-tree>
+    
+    <!-- Message si rien n'est trouvé après filtrage -->
+    <p *ngIf="racines.length === 0 && searchTerm" class="empty-state">
+      Aucun équipement ne correspond à votre recherche.
+    </p>
+  </div>
+</div>
+
+</div>

@@ -1,0 +1,217 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+@import '../../styles/list-shared.css';
+
+* {
+  font-family: 'DM Sans', sans-serif;
+  box-sizing: border-box;
+}
+
+/* ── Container ── */
+.historique-container {
+  padding: 32px;
+  max-width: 100%;
+}
+
+/* ── Header ── */
+.page-header {
+  margin-bottom: 28px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-title h1 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.35rem;
+  color: #1e2130;
+  margin: 0;
+}
+
+.header-title p {
+  font-size: 0.82rem;
+  color: #95969e;
+  margin: 3px 0 0;
+}
+
+.code-highlight {
+  color: #FFA770;
+}
+
+/* ── Bouton retour ── */
+.btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: #ffffff;
+  color: #6b6f80;
+  border: 1px solid #e2e3e8;
+  border-radius: 9px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn-back i { font-size: 15px; }
+
+.btn-back:hover {
+  background: #f4f5f7;
+  color: #1e2130;
+  border-color: #c4c5cc;
+}
+
+/* ── Tabs ── */
+.tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1.5px solid #f0f0f2;
+  margin-bottom: 24px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: #95969e;
+  background: transparent;
+  border: none;
+  border-bottom: 2.5px solid transparent;
+  margin-bottom: -1.5px;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+
+.tab i { font-size: 15px; }
+.tab:hover { color: #1e2130; }
+
+.tab.active {
+  color: #FFA770;
+  border-bottom-color: #FFA770;
+  font-weight: 600;
+}
+
+.tab .count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: #f2f3f5;
+  color: #95969e;
+  transition: all 0.18s;
+}
+
+.tab.active .count {
+  background: #fff4ec;
+  color: #FFA770;
+}
+
+/* ── Coût total bar ── */
+.cout-total-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 16px;
+  padding: 15px 20px;
+  background: #fff8f4;
+  border: 1px solid #ffd4b3;
+  border-radius: 10px;
+}
+
+.cout-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  color: #FFA770;
+}
+
+.cout-label i { font-size: 16px; }
+
+.cout-value {
+  font-family: 'Arial', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #FFA770;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3px;
+}
+
+/* ── Utilitaires spécifiques ── */
+.date-cell  { color: #95969e; font-size: 0.8rem; }
+.desc-cell  { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Ligne de filtres sous les en-têtes */
+.filter-row th {
+  padding: 4px 8px;
+  background: var(--bg-page, #fff);
+}
+
+.col-filter {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #e0e0e5;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'DM Sans', sans-serif;
+  color: #3d3d3a;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.col-filter:focus {
+  border-color: #ffa770;
+}
+
+.empty-row {
+  text-align: center;
+  color: #95969e;
+  font-size: 13px;
+  padding: 16px;
+}
+/* En-tête cliquable pour tri */
+.th-sortable {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+.th-sortable:hover {
+  color: #ffa770;
+}
+.sort-icon {
+  font-size: 13px;
+  margin-left: 4px;
+  opacity: 0.6;
+  vertical-align: middle;
+}
+.th-sortable:hover .sort-icon {
+  opacity: 1;
+  color: #ffa770;
+}
+
+/* Select dans les filtres */
+.col-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='%2395969e' stroke-width='2' d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  padding-right: 22px !important;
+  cursor: pointer;
+}

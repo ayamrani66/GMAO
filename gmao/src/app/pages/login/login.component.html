@@ -1,0 +1,123 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+   <!-- ══ Panel gauche ══ -->
+<div class="auth-panel">
+
+
+
+<div class="panel-brand">
+  <div class="rings-wrap">
+    <div class="ring ring--outer"></div>
+    <div class="ring ring--mid"></div>
+
+    <svg class="ring-svg" viewBox="0 0 120 120" fill="none">
+      <circle cx="60" cy="60" r="55" stroke="rgba(255,167,112,0.15)" stroke-width="1" stroke-dasharray="5 8"/>
+      <circle cx="60" cy="60" r="55" stroke="url(#rg)" stroke-width="1.5" stroke-dasharray="80 260" stroke-linecap="round"/>
+      <circle cx="60" cy="5" r="3.5" fill="#ffa770" opacity=".8"/>
+      <circle cx="115" cy="60" r="2.5" fill="#ff8a47" opacity=".5"/>
+      <circle cx="5" cy="60" r="2" fill="#ffa770" opacity=".3"/>
+      <defs>
+        <linearGradient id="rg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#ffa770"/>
+          <stop offset="100%" stop-color="#ff6b1a" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+    </svg>
+
+    <div class="logo-circle">
+      <img src="assets/image.png" alt="GMAO" class="brand-logo-img"/>
+    </div>
+  </div>
+</div>
+
+  <!-- ── Séparateur ── -->
+  <div class="panel-divider"></div>
+
+
+</div>
+
+    <!-- ══ Formulaire ══ -->
+    <div class="auth-form">
+      <div class="form-inner">
+
+        <div class="form-top">
+          <div class="form-eyebrow">
+            <i class="fa-solid fa-shield-halved"></i>
+            Espace sécurisé
+          </div>
+          <h2>Bon retour</h2>
+          <p>Connectez-vous pour accéder à la plateforme
+de gestion et de supervision industrielle.</p>
+        </div>
+
+        <div class="alert alert-error" *ngIf="errorMessage">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
+        </div>
+
+        <form (ngSubmit)="login()" autocomplete="on">
+
+          <!-- Email -->
+          <div class="field">
+            <label>Adresse e-mail</label>
+            <div class="input-wrap"
+                 [class.input-error]="mailError"
+                 [class.input-success]="mailOk">
+              <i class="fa-regular fa-envelope field-icon"></i>
+              <input type="email" name="mail"
+                placeholder="vous@exemple.com"
+                [(ngModel)]="mail"
+                (ngModelChange)="onMailChange()"
+                (blur)="onMailBlur()"
+                autocomplete="email" />
+              <span class="input-status" *ngIf="mailOk || mailError">
+                <i class="fa-solid fa-circle-check  status-ok"  *ngIf="mailOk"></i>
+                <i class="fa-solid fa-circle-xmark  status-err" *ngIf="mailError"></i>
+              </span>
+            </div>
+            <span class="field-msg error" *ngIf="mailError">
+              <i class="fa-solid fa-triangle-exclamation"></i> <p class="error-hint" *ngIf="mail && password && !mailOk">
+  Veuillez saisir une adresse email valide.
+</p>
+            </span>
+          </div>
+
+          <!-- Mot de passe -->
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="input-wrap">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input [type]="showPassword ? 'text' : 'password'"
+                name="password" placeholder="••••••••"
+                [(ngModel)]="password"
+                autocomplete="current-password" />
+              <button type="button" class="toggle-pwd" (click)="togglePassword()" tabindex="-1">
+                <i class="fa-regular" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="!canSubmit">
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="loading"></i>
+            <span>{{ loading ? 'Connexion...' : 'Se connecter' }}</span>
+            <i class="fa-solid fa-arrow-right btn-arrow" *ngIf="!loading"></i>
+          </button>
+
+        </form>
+
+        <p class="switch-link">
+          Pas encore de compte ?
+          <a (click)="goToRegister()">Créer un compte</a>
+        </p>
+
+        <div class="footer-text">
+      Performance • Fiabilité • Excellence
+    </div>
+        <div class="developer">
+      Conçu et développé par Aya M'rani Alaoui
+    </div>
+
+      </div>
+    </div>
+  </div> 
+</div>

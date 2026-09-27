@@ -1,0 +1,519 @@
+@import '../../styles/list-shared.css';
+@import '../../styles/form-shared.css';
+
+/* ══ Profile card ════════════════════════════════════════════════ */
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding: 24px 28px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+}
+
+/* Bloc avatar + nom */
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+
+.avatar-large {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--orange-dim);
+  border: 2px solid var(--orange);
+  color: var(--orange-dark);
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profile-name-block { display: flex; flex-direction: column; gap: 6px; }
+
+.profile-name {
+  font-family: 'Monsterrat', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.profile-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+
+/* Bloc meta (contact + stats) */
+.profile-meta {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.meta-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.meta-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-family: 'DM Mono', monospace;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.meta-value {
+  font-size: 13px;
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+}
+
+.meta-stat {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--orange-dark);
+  line-height: 1;
+}
+
+/* ══ Tabs ════════════════════════════════════════════════════════ */
+.profile-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.profile-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 20px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-bottom: -1px;
+}
+
+.profile-tab:hover {
+  color: var(--text);
+  background: var(--surface2);
+}
+
+.profile-tab.active {
+  color: var(--orange-dark);
+  border-bottom-color: var(--orange);
+  font-weight: 600;
+}
+
+.tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 18px;
+  padding: 0 6px;
+  background: var(--surface2);
+  border: 1px solid var(--border-dark);
+  border-radius: 20px;
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text-muted);
+}
+
+.profile-tab.active .tab-count {
+  background: var(--orange-dim);
+  border-color: rgba(255,167,112,.3);
+  color: var(--orange-dark);
+}
+
+/* ══ Modal profil ════════════════════════════════════════════════ */
+.profile-modal {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  width: 640px;
+  max-width: 94vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header modal — reprend le style form-header */
+.profile-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 24px;
+  border-bottom: 1.5px solid var(--surface2);
+  flex-shrink: 0;
+}
+
+.profile-modal-header .header-accent {
+  width: 3px;
+  height: 32px;
+  background: linear-gradient(180deg, var(--orange), var(--orange-dark));
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.profile-modal-header .form-label-top {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin: 0 0 2px;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.profile-modal-header h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text);
+  margin: 0;
+}
+
+.modal-close-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-dark);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.15s;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.modal-close-btn:hover {
+  border-color: var(--orange);
+  color: var(--orange-dark);
+  background: var(--orange-dim);
+}
+
+/* Body modal */
+.profile-modal-body {
+  padding: 20px 24px;
+  flex: 1;
+  overflow-y: auto;
+  background-color: #fff;
+}
+
+/* Section label dans le modal — reprend form-shared */
+.profile-modal-body .section-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin: 16px 0 0;
+  padding-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.profile-modal-body .section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background:#fff;
+}
+
+/* Field row dans le modal */
+.profile-modal-body .field-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 150px 1fr;
+  align-items: start;
+  border-top: 1px solid var(--border);
+}
+
+.profile-modal-body .field-row:first-of-type { border-top: none; }
+
+.profile-modal-body .field-label {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--text);
+  padding: 14px 12px 12px 0;
+  line-height: 1.4;
+  align-self: start;
+}
+
+.profile-modal-body .field-control {
+  padding: 9px 16px 9px 0;
+  border-right: 1px solid var(--border);
+  min-width: 0;
+}
+
+.profile-modal-body .field-row > .field-control:last-child,
+.profile-modal-body .field-row > .field-control:nth-child(4) {
+  border-right: none;
+  padding-right: 0;
+}
+
+.profile-modal-body .field-input {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid var(--border-dark);
+  border-radius: 0;
+  background: transparent;
+  font-size: 0.875rem;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text);
+  padding: 6px 0;
+  outline: none;
+  transition: border-color 0.18s;
+  appearance: none;
+}
+
+.profile-modal-body .field-input:focus {
+  border-color: var(--orange);
+}
+
+.profile-modal-body .field-input::placeholder {
+  color: #95969e;
+}
+
+.profile-modal-body .error-hint {
+  color: var(--red);
+  font-size: 0.72rem;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.profile-modal-body .success-hint {
+  color: var(--green);
+  font-size: 0.72rem;
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.profile-modal-body .alert-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-sm);
+  color: var(--red);
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+.profile-modal-body .alert-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 13px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: var(--radius-sm);
+  color: var(--green);
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+/* ── Mot de passe ───────────────────────────────────────────────── */
+.pwd-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pwd-input-wrap .field-input { padding-right: 28px; }
+
+.pwd-toggle {
+  position: absolute;
+  right: 0;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s;
+}
+
+.pwd-toggle:hover { color: var(--orange-dark); }
+
+/* Barre de force */
+.strength-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 7px;
+}
+
+.strength-track {
+  flex: 1;
+  height: 3px;
+  background: var(--border-dark);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strength-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.25s, background 0.25s;
+}
+
+.strength-fill.weak   { background: var(--red); }
+.strength-fill.medium { background: var(--amber); }
+.strength-fill.strong { background: var(--green); }
+
+.strength-label {
+  font-size: 10px;
+  font-family: 'DM Mono', monospace;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.strength-label.weak   { color: var(--red); }
+.strength-label.medium { color: var(--amber); }
+.strength-label.strong { color: var(--green); }
+
+/* Critères mot de passe */
+.pwd-criteria {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+}
+
+.pwd-criteria li {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-family: 'DM Sans', sans-serif;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+
+.pwd-criteria li.ok { color: var(--green); }
+.pwd-criteria li.ko { color: var(--text-light); }
+
+.pwd-criteria li i { font-size: 10px; }
+
+/* Footer modal */
+.profile-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+  background: var(--surface2);
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* Reprend btn-cancel / btn-submit de form-shared */
+.profile-modal-footer .btn-cancel {
+  padding: 9px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border-dark);
+  color: var(--text-mid);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.profile-modal-footer .btn-cancel:hover {
+  background: var(--border);
+}
+
+.profile-modal-footer .btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 20px;
+  background: var(--orange);
+  border: none;
+  color: #fff;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.profile-modal-footer .btn-submit:hover { background: var(--orange-dark); }
+
+.profile-modal-footer .btn-submit:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ══ Responsive ══════════════════════════════════════════════════ */
+@media (max-width: 700px) {
+  .profile-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .profile-meta { gap: 16px; }
+  .meta-divider { display: none; }
+
+  .profile-modal-body .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-modal-body .field-control {
+    border-right: none;
+    padding-right: 0;
+  }
+
+  .pwd-criteria { grid-template-columns: 1fr; }
+}

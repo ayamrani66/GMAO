@@ -1,0 +1,73 @@
+<nav class="topbar">
+  
+  <!-- GAUCHE : Navigation vers le HUB -->
+  <div class="topbar-left">
+    <a routerLink="/modules" class="hub-link" routerLinkActive="active">
+       <div class="hub-icon">
+    <!-- Icône Hub / Accueil -->
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/>
+    </svg>
+    </div>
+      <span class="brand-text">GMAO</span>
+    </a>
+    <div class="divider"></div>
+    <img src="assets/image.png" class="logo-img" alt="GMAO">
+  </div>
+
+  <!-- DROITE : Actions Utilisateur -->
+  <div class="topbar-right">
+    
+    <!-- Notifications -->
+    <div class="action-item">
+      <button class="icon-btn" (click)="goToNotifications()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+    </svg>
+    <span class="badge" *ngIf="unreadCount > 0">{{ unreadCount }}</span>
+  </button>
+
+      <!-- Dropdown Notifications -->
+      <div class="dropdown-menu notif-menu" *ngIf="showNotifications">
+        <div class="dropdown-header">
+          <span>Notifications</span>
+          <a (click)="goToNotifications()">Tout voir</a>
+        </div>
+        <div class="notif-list">
+          <div class="notif-item" *ngFor="let n of notifications | slice:0:5" [class.unread]="!n.lu">
+            <p>{{ n.message }}</p>
+            <span class="time">{{ n.dateCreation | date:'dd/MM HH:mm' }}</span>
+          </div>
+          <div class="empty-state" *ngIf="notifications.length === 0">
+            Aucune notification
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Profil -->
+    <div class="profile-section" (click)="goToProfile()">
+      <div class="avatar">
+        {{ currentUser?.nomComplet?.charAt(0)?.toUpperCase() }}
+      </div>
+      <div class="user-info">
+        <span class="user-name">{{ currentUser?.nomComplet }}</span>
+        <span class="user-role">{{ currentUser?.role }}</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Déconnexion -->
+    <button class="logout-btn" (click)="logout()" title="Déconnexion">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+      </svg>
+    </button>
+
+  </div>
+</nav>

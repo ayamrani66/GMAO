@@ -1,0 +1,256 @@
+<div class="form-page" [class.mode-correctif]="isCorrectif">
+
+  <div class="form-header">
+    <div class="header-accent" [style.background]="isCorrectif ? '#e74c3c' : '#3498db'"></div>
+    <div>
+      <p class="form-label-top">{{ editMode ? 'Modifier' : 'Nouvel' }} 
+        {{ isCorrectif ? 'ordre correctif' : 'ordre préventif' }}</p>
+      <h2>
+        {{ (savedOtId && !editMode) ? 'OT #' + savedOtId + ' enregistré ✅'
+           : editMode ? 'Modifier OT #' + editOtId
+           : (isCorrectif ? 'Créer un OT Correctif' : 'Créer un OT Préventif') }}
+      </h2>
+    </div>
+  </div>
+
+  <div class="form-body">
+    <ng-container *ngIf="!savedOtId || editMode">
+
+      <div class="section-label">Équipement concerné</div>
+<div class="field-row">
+  <label class="field-label">Équipement <span class="required">*</span></label>
+  <div class="field-control" style="grid-column: span 3; position: relative;">
+    
+    <!-- Input de recherche -->
+    <div class="search-input-wrapper">
+      <span class="search-icon">🔍</span>
+      <input class="field-input" type="text"
+             placeholder="Rechercher dans l'arborescence..."
+             [(ngModel)]="searchEquipement"
+             (input)="filterTree()"
+             (focus)="showTree = true" />
+      <button class="clear-btn" *ngIf="searchEquipement" (click)="searchEquipement=''; ot.equipementId=null">×</button>
+    </div>
+
+    <!-- Dropdown avec Arbre -->
+    <div class="custom-dropdown-list tree-dropdown" *ngIf="showTree">
+      <ng-container *ngTemplateOutlet="treeTemplate; context:{ $implicit: nodes }"></ng-container>
+    </div>
+
+    <!-- Template récursif pour l'arbre -->
+    <ng-template #treeTemplate let-list>
+      <ul class="tree-root">
+        <li *ngFor="let node of list" class="tree-node">
+          <div class="tree-item-content" (click)="selectNode(node)">
+            <!-- Flèche de déploiement -->
+            <span class="tree-arrow" 
+                  *ngIf="node.children && node.children.length > 0"
+                  (click)="toggleNode(node, $event)"
+                  [class.expanded]="node.isExpanded">
+              ▶
+            </span>
+            <span class="tree-spacer" *ngIf="!node.children || node.children.length === 0"></span>
+            
+            <span class="node-label">{{ node.libelle }}</span>
+            <span class="node-code">{{ node.codeEquipement }}</span>
+          </div>
+          
+          <!-- Rendu des enfants -->
+          <div class="tree-children" *ngIf="node.isExpanded && node.children.length > 0">
+            <ng-container *ngTemplateOutlet="treeTemplate; context:{ $implicit: node.children }"></ng-container>
+          </div>
+        </li>
+      </ul>
+    </ng-template>
+
+    <div class="dropdown-backdrop" *ngIf="showTree" (click)="showTree = false"></div>
+  </div>
+</div>
+
+      <!-- ══ INFORMATIONS OT ══════════════════════════════════════ -->
+      <div class="section-label">Informations</div>
+
+      <div class="field-row">
+        <label class="field-label">Titre <span class="required">*</span></label>
+        <div class="field-control" >
+          <input class="field-input" type="text"
+                 placeholder="Ex: Révision périodique transformateur..."
+                 [(ngModel)]="ot.titre" />
+          <div class="field-error" *ngIf="submitted && !ot.titre?.trim()">
+            <i class="fa-solid fa-circle-exclamation"></i> Le titre est obligatoire
+          </div>
+        </div>
+        <label class="field-label">Priorité <span class="required">*</span></label>
+        <div class="field-control">
+          <select class="field-select" [(ngModel)]="ot.priorite">
+            <option *ngFor="let p of priorites" [value]="p">{{ p }}</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label">Nature d'anomalie</label>
+        <div class="field-control">
+          <select class="field-select" [(ngModel)]="ot.natureAnomalie">
+            <option [ngValue]="null" disabled>-- Sélectionner --</option>
+            <option *ngFor="let n of naturesAnomalie" [value]="n.value">{{ n.label }}</option>
+          </select>
+        </div>
+        <label class="field-label" *ngIf="isCorrectif">Technicien <span class="required">*</span></label>
+              <div class="role-tech-grid role-tech-grid-sm" *ngIf="isCorrectif">
+                <button *ngFor="let role of rolesTechnicien"
+                        class="role-tech-btn"
+                        [class.selected]="ot.affectationTechnicien === role.value"
+                        (click)="ot.affectationTechnicien = role.value"
+                        type="button">
+                  <span class="role-tech-icon">{{ role.icon }}</span>
+                  <span class="role-tech-label">{{ role.label }}</span>
+                </button>
+              </div>
+        
+      </div>
+
+      <ng-container *ngIf="!isCorrectif">
+
+      <!-- ══ ACTIONS À RÉALISER ════════════════════════════════════ -->
+      <div class="section-label">Actions à réaliser</div>
+
+      <div class="field-full">
+
+
+        <!-- Formulaire d'ajout d'action -->
+        <div class="action-struct-form" *ngIf="ot.equipementId">
+          <div class="action-struct-grid">
+
+            <div class="action-context-banner" *ngIf="nouvelleActionStructuree.equipementLabel">
+              <label>Equipement</label><br>
+    📍 {{ nouvelleActionStructuree.equipementLabel }}
+    <span *ngIf="nouvelleActionStructuree.sousEquipementLabel">
+      › {{ nouvelleActionStructuree.sousEquipementLabel }}
+    </span>
+  </div>
+
+            <!-- Action (texte libre) -->
+             
+            <div class="struct-field span-2">
+              <label>Action <span class="required">*</span></label>
+              <input class="field-input" type="text"
+                     placeholder="Ex: Graissage point A..."
+                     [(ngModel)]="nouvelleActionStructuree.action" />
+            </div>
+
+            <!-- Mode -->
+            <div class="struct-field">
+              <label>Mode <span class="required">*</span></label>
+              <select class="field-select" [(ngModel)]="nouvelleActionStructuree.mode">
+                <option value="">-- Sélectionner --</option>
+                <option value="Marche">Marche</option>
+                <option value="Arret">Arrêt</option>
+              </select>
+            </div>
+
+            <!-- Moyen de contrôle -->
+            <div class="struct-field">
+              <label>Moyen de contrôle</label>
+              <input class="field-input" type="text"
+                     placeholder="Ex: Visuel, manomètre…"
+                     [(ngModel)]="nouvelleActionStructuree.moyenControle" />
+            </div>
+
+            <div class="struct-field">
+        <label >Nature d'anomalie</label>
+          <select class="field-select" [(ngModel)]="nouvelleActionStructuree.natureAnomalie">
+            <option [ngValue]="null" disabled>-- Sélectionner --</option>
+            <option *ngFor="let n of naturesAnomalie" [value]="n.value">{{ n.label }}</option>
+          </select>
+        </div>
+
+        <div class="struct-field" *ngIf="sousEquipementsFiltres.length > 0">
+      <label>Sous-équipement</label>
+      <select class="field-select" [(ngModel)]="nouvelleActionStructuree.sousEquipementLabel">
+        <option value="">-- Aucun --</option>
+        <option *ngFor="let se of sousEquipementsFiltres" [value]="se.libelle">
+          {{ se.libelle }} ({{ se.codeEquipement }})
+        </option>
+      </select>
+    </div>
+
+            <!-- Technicien -->
+            <div class="struct-field span-2">
+              <label>Technicien <span class="required">*</span></label>
+              <div class="role-tech-grid role-tech-grid-sm">
+                <button *ngFor="let role of rolesTechnicien"
+                        class="role-tech-btn"
+                        [class.selected]="nouvelleActionStructuree.affectationTechnicien === role.value"
+                        (click)="nouvelleActionStructuree.affectationTechnicien = role.value"
+                        type="button">
+                  <span class="role-tech-icon">{{ role.icon }}</span>
+                  <span class="role-tech-label">{{ role.label }}</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <button class="btn-add-action" type="button"
+        (click)="ajouterActionStructuree()"
+        [disabled]="!nouvelleActionStructuree.equipementLabel.trim() ||
+                    !nouvelleActionStructuree.action.trim() ||
+                    !nouvelleActionStructuree.mode ||
+                    !nouvelleActionStructuree.affectationTechnicien">
+  + Ajouter cette action
+</button>
+        </div>
+
+        <!-- Liste des actions ajoutées -->
+        <div class="actions-struct-list" *ngIf="ot.actionsStructurees.length > 0">
+          <div class="action-struct-card"
+               *ngFor="let a of ot.actionsStructurees; let i = index">
+            <div class="asc-left">
+              <span class="asc-equip">{{ a.equipementLabel}}</span>
+              <span class="asc-sep" *ngIf="a.sousEquipementLabel"> › {{ a.sousEquipementLabel }}</span>
+              <span class="asc-action"> — {{ a.action }}</span>
+            </div>
+            <div class="asc-right">
+              <span class="badge-mode" [class.marche]="a.mode === 'Marche'">{{ a.mode }}</span>
+              <span class="role-badge-sm">{{ getRoleTechnicienLabel(a.affectationTechnicien || '') }}</span>
+              <span class="asc-controle" *ngIf="a.moyenControle">🔍 {{ a.moyenControle }}</span>
+              <button class="btn-remove-action" type="button"
+                      (click)="supprimerActionStructuree(i)">✕</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="actions-empty" *ngIf="ot.actionsStructurees.length === 0 && ot.equipementId">
+          Aucune action ajoutée.
+        </p>
+      </div>
+      </ng-container>
+
+      <!-- Après création réussie : afficher le composant upload -->
+      <div class="field-full" *ngIf="!editMode">
+        <label class="field-label">Pièces jointes — OT #{{ savedOtId }}</label>
+        <app-file-upload [otId]="savedOtId"></app-file-upload>
+      </div>
+
+      <!-- ══ PIÈCES JOINTES ════════════════════════════════════════ -->
+      <!-- Toujours affiché (en création après save, en édition toujours) -->
+      <div class="field-full" *ngIf="savedOtId || editMode">
+        <label class="field-label">Pièces jointes</label>
+        <app-file-upload [otId]="savedOtId || editOtId"></app-file-upload>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn-cancel" type="button" (click)="annuler()">Annuler</button>
+        <button class="btn-submit" type="button" (click)="save()">
+          <i class="fa-solid fa-floppy-disk"></i>
+          {{ editMode ? 'Enregistrer' : 'Créer l\'OT' }}
+        </button>
+      </div>
+
+    </ng-container>
+
+    
+
+  </div>
+</div>

@@ -1,0 +1,71 @@
+@import '../../styles/list-shared.css';
+/* ── Onglets ── */
+.tabs-container {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 16px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
+}
+
+.tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tab-btn:hover { color: #ffa770; }
+
+.tab-btn.active {
+  color: #ffa770;
+  border-bottom-color: #ffa770;
+  font-weight: 600;
+}
+
+.tab-badge {
+  background: #f3f4f6;
+  color: #6b7280;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+}
+
+.tab-btn.active .tab-badge {
+  background: #fff0e8;
+  color: #ffa770;
+}
+
+/* ── Chip fréquence ── */
+.freq-chip {
+  display: inline-block;
+  background: #fff0e8;
+  color: #ffa770;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  margin-right: 4px;
+}
+/* input date dans col-filter */
+.col-filter-input[type="date"] {
+  width: 100%;
+  margin-top: 4px;
+  padding: 3px 6px;
+  font-size: 0.72rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #374151;
+  background: #fff;
+}

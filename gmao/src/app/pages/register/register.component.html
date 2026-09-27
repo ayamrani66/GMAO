@@ -1,0 +1,189 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+<!-- ══ Panel gauche ══ -->
+<div class="auth-panel">
+
+  <!-- Fonds -->
+  <div class="panel-orb panel-orb--1"></div>
+  <div class="panel-orb panel-orb--2"></div>
+  <div class="panel-orb panel-orb--3"></div>
+  <div class="panel-hex-grid"></div>
+
+  <!-- ── Brand centrale ── -->
+  <div class="panel-brand">
+
+    <!-- Anneaux + Logo -->
+    <div class="rings-wrap">
+      <div class="ring ring--outer"></div>
+      <div class="ring ring--mid"></div>
+
+      <svg class="ring-svg" viewBox="0 0 120 120" fill="none">
+        <circle cx="60" cy="60" r="55"
+          stroke="rgba(255,167,112,0.15)"
+          stroke-width="1" stroke-dasharray="5 8"/>
+        <circle cx="60" cy="60" r="55"
+          stroke="url(#rg)" stroke-width="1.5"
+          stroke-dasharray="80 260" stroke-linecap="round"/>
+        <circle cx="60" cy="5"   r="3.5" fill="#ffa770" opacity=".8"/>
+        <circle cx="115" cy="60" r="2.5" fill="#ff8a47" opacity=".5"/>
+        <circle cx="5"   cy="60" r="2"   fill="#ffa770" opacity=".3"/>
+        <defs>
+          <linearGradient id="rg" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#ffa770"/>
+            <stop offset="100%" stop-color="#ff6b1a" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+
+      <div class="logo-circle">
+        <img src="assets/image.png" alt="GMAO" class="brand-logo-img"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Séparateur ── -->
+  <div class="panel-divider"></div>
+
+</div>
+
+    <!-- ══ Formulaire ══ -->
+    <div class="auth-form">
+      <div class="form-inner">
+
+        <div class="form-top">
+          <div class="form-eyebrow">
+            <i class="fa-solid fa-user-plus"></i>
+            Nouveau compte
+          </div>
+          <h2>Créer un compte</h2>
+          <p>Un administrateur vous assignera un rôle après validation</p>
+        </div>
+
+        <div class="alert alert-success" *ngIf="successMessage">
+          <i class="fa-solid fa-circle-check"></i> {{ successMessage }}
+        </div>
+        <div class="alert alert-error" *ngIf="errorMessage">
+          <i class="fa-solid fa-circle-exclamation"></i> {{ errorMessage }}
+        </div>
+
+        <form (ngSubmit)="register()" autocomplete="off">
+
+          <!-- Nom + Téléphone -->
+          <div class="field-row">
+            <div class="field">
+              <label>Nom complet</label>
+              <div class="input-wrap">
+                <i class="fa-regular fa-user field-icon"></i>
+                <input type="text" name="nomComplet" placeholder="Votre nom complet"
+                  [(ngModel)]="user.nomComplet" required />
+              </div>
+            </div>
+            <div class="field">
+              <label>Téléphone</label>
+              <div class="input-wrap">
+                <i class="fa-solid fa-phone field-icon"></i>
+                <input type="text" name="telephone" placeholder="+212 6xx xxx xxx"
+                  [(ngModel)]="user.telephone" maxlength="10" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="field">
+            <label>Adresse e-mail</label>
+            <div class="input-wrap"
+                 [class.input-error]="mailTaken"
+                 [class.input-success]="mailValid">
+              <i class="fa-regular fa-envelope field-icon"></i>
+              <input type="email" name="mail" placeholder="vous@exemple.com"
+                [(ngModel)]="user.mail" required
+                (ngModelChange)="onMailChange($event)" />
+              <span class="input-status">
+                <i class="fa-solid fa-spinner fa-spin"   *ngIf="mailChecking"             style="color:#c0b8af"></i>
+                <i class="fa-solid fa-circle-check  status-ok"  *ngIf="mailValid && !mailChecking"></i>
+                <i class="fa-solid fa-circle-xmark  status-err" *ngIf="mailTaken && !mailChecking"></i>
+              </span>
+            </div>
+            <span class="field-msg error" *ngIf="mailTaken && !mailChecking">
+              <i class="fa-solid fa-triangle-exclamation"></i> Cet e-mail est déjà utilisé
+            </span>
+          </div>
+
+          <!-- Mot de passe -->
+          <div class="field">
+            <label>Mot de passe</label>
+            <div class="input-wrap"
+                 [class.input-error]="user.password && !isPasswordValid"
+                 [class.input-success]="user.password && isPasswordValid">
+              <i class="fa-solid fa-lock field-icon"></i>
+              <input [type]="showPassword ? 'text' : 'password'"
+                name="password" placeholder="Créez un mot de passe fort"
+                [(ngModel)]="user.password" required
+                (ngModelChange)="onPasswordChange($event)" />
+              <button type="button" class="toggle-pwd" (click)="togglePassword()" tabindex="-1">
+                <i class="fa-regular" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+              </button>
+            </div>
+
+            <!-- Force -->
+            <div class="strength-bar" *ngIf="user.password">
+              <div class="strength-track">
+                <div class="strength-fill"
+                  [class.weak]="passwordStrength==='weak'"
+                  [class.medium]="passwordStrength==='medium'"
+                  [class.strong]="passwordStrength==='strong'"
+                  [style.width.%]="passwordStrengthScore * 25">
+                </div>
+              </div>
+              <span class="strength-label" [class]="passwordStrength">
+                {{ passwordStrength==='weak' ? 'Faible' : passwordStrength==='medium' ? 'Moyen' : 'Fort' }}
+              </span>
+            </div>
+
+            <!-- Critères -->
+            <ul class="pwd-criteria" *ngIf="user.password">
+              <li [class.ok]="passwordCriteria.length">
+                <i class="fa-solid" [class.fa-check]="passwordCriteria.length" [class.fa-circle]="!passwordCriteria.length"></i>
+                8 caractères min
+              </li>
+              <li [class.ok]="passwordCriteria.uppercase">
+                <i class="fa-solid" [class.fa-check]="passwordCriteria.uppercase" [class.fa-circle]="!passwordCriteria.uppercase"></i>
+                Majuscule
+              </li>
+              <li [class.ok]="passwordCriteria.number">
+                <i class="fa-solid" [class.fa-check]="passwordCriteria.number" [class.fa-circle]="!passwordCriteria.number"></i>
+                Chiffre
+              </li>
+              <li [class.ok]="passwordCriteria.special">
+                <i class="fa-solid" [class.fa-check]="passwordCriteria.special" [class.fa-circle]="!passwordCriteria.special"></i>
+                Caractère spécial
+              </li>
+            </ul>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="!canSubmit">
+            <i class="fa-solid fa-spinner fa-spin" *ngIf="loading"></i>
+            <span>{{ loading ? 'Création...' : 'Créer mon compte' }}</span>
+            <i class="fa-solid fa-arrow-right btn-arrow" *ngIf="!loading"></i>
+          </button>
+
+        </form>
+
+        <p class="switch-link">
+          Déjà un compte ?
+          <a (click)="goToLogin()">Se connecter</a>
+        </p>
+
+        <div class="footer-text">
+      Performance • Fiabilité • Excellence
+    </div>
+        <div class="developer">
+      Conçu et développé par Aya M'rani Alaoui
+    </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

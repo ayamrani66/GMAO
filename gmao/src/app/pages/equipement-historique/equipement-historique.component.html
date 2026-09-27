@@ -1,0 +1,294 @@
+<div class="historique-container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="header-left">
+      <div class="header-title">
+        <h1>Historique — <span class="code-highlight">{{ equipement?.codeEquipement }}</span></h1>
+        <p>{{ equipement?.libelle }}</p>
+      </div>
+    </div>
+    <a class="btn-back" (click)="goBack()">Retour aux équipements</a>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs" role="tablist">
+    <button class="tab" [class.active]="activeSection === 'ot'" (click)="activeSection = 'ot'" role="tab">
+      <i class="ti ti-file-check"></i>
+      Ordres de travail
+      <span class="count">{{ ordres.length }}</span>
+    </button>
+    <button class="tab" [class.active]="activeSection === 'di'" (click)="activeSection = 'di'" role="tab">
+      <i class="ti ti-clipboard-list"></i>
+      Demandes d'intervention
+      <span class="count">{{ demandes.length }}</span>
+    </button>
+    <button class="tab" [class.active]="activeSection === 'pdr'" (click)="activeSection = 'pdr'" role="tab">
+      <i class="ti ti-package"></i>
+      PDR consommées
+      <span class="count">{{ pdrConsommees.length }}</span>
+    </button>
+  </div>
+
+  <!-- ===================== SECTION OT ===================== -->
+  <div *ngIf="activeSection === 'ot'">
+    <div class="table-card" *ngIf="!loadingOt">
+
+      <table *ngIf="ordres.length > 0; else emptyOt">
+        <thead>
+          <!-- EN-TÊTES cliquables pour date/coût -->
+          <tr>
+            <th>Code OT</th>
+            <th class="th-sortable" (click)="toggleSortOtDate()">
+              Date création
+              <i class="ti {{ sortIcon(sortOtDate) }} sort-icon"></i>
+            </th>
+            <th>Titre</th>
+            <th>Type</th>
+            <th>Nature anomalie</th>
+            <th>Priorité</th>
+            <th>Statut</th>
+            <th>Technicien</th>
+            
+            <th class="th-sortable text-right" (click)="toggleSortOtCout()">
+              Coût (MAD)
+              <i class="ti {{ sortIcon(sortOtCout) }} sort-icon"></i>
+            </th>
+          </tr>
+          <!-- FILTRES -->
+          <tr class="filter-row">
+            <!-- Code OT : pas de filtre -->
+            <th></th>
+
+            <th></th>
+            <!-- Titre : texte libre -->
+            <th>
+              <input class="col-filter" placeholder="Rechercher…"
+                [(ngModel)]="filtreOt['titre']"
+                (ngModelChange)="appliquerFiltresOt()" />
+            </th>
+            
+            <!-- Type : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreOt['typeOT']"
+                (ngModelChange)="appliquerFiltresOt()">
+                <option value="">Tous</option>
+                <option *ngFor="let o of typeOTOptions" [value]="o">{{ o }}</option>
+              </select>
+            </th>
+            <!-- Nature : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreOt['natureAnomalie']"
+                (ngModelChange)="appliquerFiltresOt()">
+                <option value="">Toutes</option>
+                <option *ngFor="let o of natureOptions" [value]="o">{{ o }}</option>
+              </select>
+            </th>
+            <!-- Priorité : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreOt['priorite']"
+                (ngModelChange)="appliquerFiltresOt()">
+                <option value="">Toutes</option>
+                <option *ngFor="let o of prioriteOptions" [value]="o">{{ o }}</option>
+              </select>
+            </th>
+            <!-- Statut : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreOt['statut']"
+                (ngModelChange)="appliquerFiltresOt()">
+                <option value="">Tous</option>
+                <option *ngFor="let o of statutOTOptions" [value]="o">{{ formatStatut(o) }}</option>
+              </select>
+            </th>
+            <!-- Technicien : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreOt['affectationTechnicien']"
+                (ngModelChange)="appliquerFiltresOt()">
+                <option value="">Tous</option>
+                <option *ngFor="let o of techOptions" [value]="o">{{ affectationLabels[o] }}</option>
+              </select>
+            </th>
+            <!-- Coût : tri via en-tête, pas de filtre ici -->
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let ot of ordresFiltres" (click)="goToDetailOt(ot)">
+            <td><span class="code-chip">{{ ot.codeOT || '#' + ot.id }}</span></td>
+            <td class="date-cell">{{ ot.dateCreation | date:'dd/MM/yyyy' }}</td>
+            <td class="desc-cell">{{ ot.titre || '—' }}</td>
+            <td>{{ ot.typeOT || '—' }}</td>
+            <td>{{ ot.natureAnomalie || '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="getPrioriteClass(ot.priorite)">{{ ot.priorite || '—' }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatutClass(ot.statut)">{{ formatStatut(ot.statut) }}</span>
+            </td>
+            <td>{{ affectationLabels[ot.affectationTechnicien] || ot.affectationTechnicien }}</td>
+            <td class="text-right tabular-nums">
+              <span *ngIf="ot.coutIntervention && !roleService.isSuperviseur()">{{ ot.coutIntervention | number:'1.2-2' }}</span>
+              <span *ngIf="!ot.coutIntervention" class="text-muted">—</span>
+            </td>
+          </tr>
+          <tr *ngIf="ordresFiltres.length === 0">
+            <td colspan="9" class="empty-row">Aucun résultat pour ces filtres</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="cout-total-bar" *ngIf="coutTotal > 0 && !roleService.isSuperviseur()">
+        <span class="cout-label"><i class="ti ti-calculator"></i> Coût total des interventions</span>
+        <span class="cout-value">{{ coutTotal | number:'1.2-2' }} MAD</span>
+      </div>
+
+      <ng-template #emptyOt>
+        <div class="empty-state"><i class="ti ti-file-off"></i> Aucun OT trouvé</div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- ===================== SECTION DI ===================== -->
+  <div *ngIf="activeSection === 'di'">
+    <div class="table-card" *ngIf="!loadingDi">
+
+      <table *ngIf="demandes.length > 0; else emptyDi">
+        <thead>
+          <tr>
+            <th>Code DI</th>
+            <th class="th-sortable" (click)="toggleSortDiDate()">
+              Date
+              <i class="ti {{ sortIcon(sortDiDate) }} sort-icon"></i>
+            </th>
+            <th>Description</th>
+            <th>Source</th>
+            <th>Priorité</th>
+            <th>Statut</th>
+            
+          </tr>
+          <tr class="filter-row">
+            <!-- Code DI : pas de filtre -->
+            <th></th>
+            <!-- Date : tri via en-tête -->
+            <th></th>
+            <!-- Description : texte libre -->
+            <th>
+              <input class="col-filter" placeholder="Rechercher…"
+                [(ngModel)]="filtreDi['description']"
+                (ngModelChange)="appliquerFiltresDi()" />
+            </th>
+            <!-- Source : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreDi['source']"
+                (ngModelChange)="appliquerFiltresDi()">
+                <option value="">Toutes</option>
+                <option *ngFor="let o of sourceOptions" [value]="o">{{ o }}</option>
+              </select>
+            </th>
+            <!-- Priorité : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreDi['priorite']"
+                (ngModelChange)="appliquerFiltresDi()">
+                <option value="">Toutes</option>
+                <option *ngFor="let o of prioriteOptions" [value]="o">{{ o }}</option>
+              </select>
+            </th>
+            <!-- Statut : liste -->
+            <th>
+              <select class="col-filter col-select"
+                [(ngModel)]="filtreDi['statut']"
+                (ngModelChange)="appliquerFiltresDi()">
+                <option value="">Tous</option>
+                <option *ngFor="let o of statutDIOptions" [value]="o">{{ formatStatutDi(o) }}</option>
+              </select>
+            </th>
+            
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let di of demandesFiltrees" (click)="goToDetailDi(di)">
+            <td><span class="code-chip">{{ di.codeDI || '#' + di.id }}</span></td>
+            <td class="date-cell">{{ di.dateDemande | date:'dd/MM/yyyy' }}</td>
+            <td class="desc-cell">{{ di.description }}</td>
+            <td>{{ di.source || '—' }}</td>
+            <td>
+              <span class="badge" [ngClass]="getPrioriteClass(di.priorite)">{{ di.priorite }}</span>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="getStatutDiClass(di.statut)">{{ formatStatutDi(di.statut) }}</span>
+            </td>
+            
+          </tr>
+          <tr *ngIf="demandesFiltrees.length === 0">
+            <td colspan="6" class="empty-row">Aucun résultat pour ces filtres</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyDi>
+        <div class="empty-state"><i class="ti ti-clipboard-off"></i> Aucune demande trouvée</div>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- ===================== SECTION PDR ===================== -->
+  <div *ngIf="activeSection === 'pdr'">
+    <div class="table-card">
+
+      <table *ngIf="pdrConsommees.length > 0; else emptyPdr">
+        <thead>
+          <tr>
+            <th>OT</th>
+            <th>Article</th>
+            <th class="th-sortable" (click)="toggleSortPdrQte()">
+              Quantité
+              <i class="ti {{ sortIcon(sortPdrQte) }} sort-icon"></i>
+            </th>
+            <th class="th-sortable text-right" (click)="toggleSortPdrPrix()">
+              Prix unitaire (MAD)
+              <i class="ti {{ sortIcon(sortPdrPrix) }} sort-icon"></i>
+            </th>
+          </tr>
+          <tr class="filter-row">
+            <th></th>
+            <th>
+              <input class="col-filter" placeholder="Rechercher…"
+                [(ngModel)]="filtrePdr['article']"
+                (ngModelChange)="appliquerFiltresPdr()" />
+            </th>
+            <!-- Quantité : tri via en-tête -->
+            <th></th>
+            <!-- Prix : tri via en-tête -->
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pdr of pdrFiltrees">
+            <td><span class="code-chip">{{ pdr.codeOT }}</span></td>
+            <td>{{ pdr.article }}</td>
+            <td class="tabular-nums">{{ pdr.quantiteConsommee }}</td>
+            <td class="text-right tabular-nums">
+              <span *ngIf="pdr.prixUnitaire">{{ pdr.prixUnitaire | number:'1.2-2' }}</span>
+              <span *ngIf="!pdr.prixUnitaire" class="text-muted">—</span>
+            </td>
+          </tr>
+          <tr *ngIf="pdrFiltrees.length === 0">
+            <td colspan="5" class="empty-row">Aucun résultat pour ces filtres</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyPdr>
+        <div class="empty-state"><i class="ti ti-package-off"></i> Aucune pièce consommée enregistrée</div>
+      </ng-template>
+    </div>
+  </div>
+
+</div>

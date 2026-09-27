@@ -1,0 +1,23 @@
+<div class="dialog-card">
+
+  <div class="dialog-header">
+    <p class="dialog-title">Archiver l'équipement</p>
+  </div>
+
+  <p class="dialog-label">Cause de l'archivage</p>
+  <textarea
+    [(ngModel)]="cause"
+    placeholder="Saisir la cause...">
+  </textarea>
+
+  <div class="dialog-actions">
+    <button class="btn btn-cancel" type="button" (click)="onCancel()">
+      Annuler
+    </button>
+    <button class="btn btn-archive" type="button" (click)="onSave()">
+      <i class="ti ti-archive" style="font-size:14px; vertical-align:-1px; margin-right:4px;"></i>
+      Archiver
+    </button>
+  </div>
+
+</div>

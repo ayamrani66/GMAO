@@ -1,0 +1,92 @@
+/* Conteneur principal en colonne */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Prend toute la hauteur de l'écran */
+  width: 100%;
+  background-color: #fff; /* Couleur de fond globale (Slate 50) */
+}
+
+/* Header qui contient la Topbar */
+.layout-header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Zone principale où s'affichent vos pages */
+.layout-content {
+  flex: 1; /* Prend tout l'espace restant sous la topbar */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Conteneur interne pour limiter la largeur sur les très grands écrans (optionnel) */
+.content-container {
+  flex: 1;
+  width: 100%;
+  max-width: 1600px; /* Largeur max pour le confort visuel */
+  margin: 0 auto;
+  padding: 20px; /* Espace entre le bord de l'écran et le contenu */
+  box-sizing: border-box;
+}
+
+/* Gestion du responsive : on réduit le padding sur petit écran */
+@media (max-width: 768px) {
+  .content-container {
+    padding: 10px;
+  }
+}
+/* ── Layout global ── */
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-content {
+  flex: 1; /* pousse le footer vers le bas */
+}
+
+/* ── Footer ── */
+.layout-footer {
+  background-color: #ffffff;
+  border-top: 2px solid #f0f0f0;
+  padding: 14px 32px;
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  color: #95969e;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #2d2d2d;
+}
+
+.footer-logo {
+  height: 24px;
+  object-fit: contain;
+}
+
+.footer-center {
+  text-align: center;
+  font-style: italic;
+}
+
+.footer-right {
+  text-align: right;
+}

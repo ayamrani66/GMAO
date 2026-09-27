@@ -1,0 +1,137 @@
+/* ============================================================
+   GLOBAL STYLES — styles.css
+   Design: Light Refined — GMAO App
+   Fonts: Outfit (display) + Manrope (body)
+   Palette: #ffa770 orange · #1a1d2e dark · #f5f6fa light bg
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Manrope:wght@300;400;500;600;700&display=swap');
+
+/* ===== VARIABLES ===== */
+:root {
+  --orange:        #ffa770;
+  --orange-dark:   #ff8a47;
+  --orange-light:  #fff3ec;
+  --orange-mid:    #ffe0cc;
+
+  --dark:          #1a1d2e;
+  --dark-2:        #2c3047;
+  --dark-3:        #3d4263;
+
+  --gray:          #95969e;
+  --gray-light:    #c8cad4;
+  --gray-lighter:  #e8e9ef;
+
+  --bg:            #f5f6fa;
+  --bg-card:       #ffffff;
+  --bg-hover:      #f0f1f6;
+
+  --text:          #1a1d2e;
+  --text-muted:    #6b6f80;
+  --text-light:    #95969e;
+
+  --border:        #e8e9ef;
+  --border-focus:  #ffa770;
+
+  --radius-sm:     8px;
+  --radius:        12px;
+  --radius-lg:     18px;
+  --radius-xl:     24px;
+
+  --shadow-sm:     0 1px 3px rgba(26,29,46,.06), 0 1px 2px rgba(26,29,46,.04);
+  --shadow:        0 4px 16px rgba(26,29,46,.08), 0 1px 4px rgba(26,29,46,.04);
+  --shadow-lg:     0 12px 40px rgba(26,29,46,.12), 0 4px 12px rgba(26,29,46,.06);
+  --shadow-orange: 0 4px 20px rgba(255,167,112,.3);
+
+  --sidebar-w:     256px;
+  --topbar-h:      64px;
+
+  --font-display: 'Outfit', sans-serif;
+  --font-body:    'Manrope', sans-serif;
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  background: var(--bg);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===== LAYOUT ===== */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--bg);
+  transition: margin-left .25s ease;
+}
+
+.content {
+  flex: 1;
+  padding: 28px 32px;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--dark);
+  line-height: 1.25;
+}
+
+h1 { font-size: 1.75rem; }
+h2 { font-size: 1.375rem; }
+h3 { font-size: 1.125rem; }
+h4 { font-size: 1rem; }
+
+p  { color: var(--text-muted); line-height: 1.65; }
+
+a  { text-decoration: none; color: inherit; }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-lighter); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-light); }
+
+/* ===== SELECTION ===== */
+::selection { background: var(--orange-mid); color: var(--dark); }
+
+/* ===== ANGULAR MATERIAL — DIALOG OVERRIDES ===== */
+.cdk-overlay-backdrop.cdk-overlay-dark-backdrop {
+  background: rgba(15, 17, 30, 0.35) !important;
+  backdrop-filter: blur(3px);
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  background: #ffffff !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  border: 1.5px solid #e8e9ef !important;
+}
+
+/* Compatibilité anciennes versions Material */
+.mat-dialog-container {
+  background: #ffffff !important;
+  border-radius: 18px !important;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.1) !important;
+  padding: 0 !important;
+  border: 1.5px solid #e8e9ef !important;
+}

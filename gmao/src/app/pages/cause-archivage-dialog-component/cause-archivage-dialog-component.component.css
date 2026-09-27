@@ -1,0 +1,102 @@
+.dialog-card {
+  background: #ffffff;
+  border: 0.5px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 420px;
+  margin: 1rem auto;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.25rem;
+}
+
+.dialog-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #FAEEDA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 18px;
+  color: #854F0B;
+}
+
+.dialog-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.dialog-label {
+  font-size: 13px;
+  color: #888;
+  margin: 0 0 8px;
+}
+
+textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 0.5px solid #ccc;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1a1a1a;
+  background: #f9f9f9;
+  resize: vertical;
+  min-height: 100px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+textarea:focus {
+  border-color: #ffa770;
+}
+
+textarea::placeholder {
+  color: #bbb;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 1rem;
+}
+
+.btn {
+  padding: 7px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 0.5px solid #ccc;
+  transition: background 0.15s;
+}
+
+.btn-cancel {
+  background: transparent;
+  color: #666;
+}
+
+.btn-cancel:hover {
+  background: #f5f5f5;
+}
+
+.btn-archive {
+  background: #ffa770;
+  color: #412402;
+  border-color: #ffa770;
+  font-weight: 500;
+}
+
+.btn-archive:hover {
+  background: #ffa770cd;
+  border-color: #ffa770cd;
+}

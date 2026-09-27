@@ -1,0 +1,14 @@
+.metadata/
+*.class
+target/
+node_modules/
+.angular/
+src/main/resources/application.properties
+IA/gmao_models.pkl
+*.pkl
+IA/gmao_models.pkl
+*.pkl
+IA/gmao_models.pkl
+*.pkl
+IA/gmao_models.pkl
+*.pkl
